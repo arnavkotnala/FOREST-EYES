@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ForestWatch — Deforestation Intelligence Platform
  * =================================================
  * Full API integration extracted from the wri/gfw GitHub repository:
@@ -88,6 +88,151 @@ const gladAlertsLayer = L.tileLayer('https://tiles.globalforestwatch.org/glad_pr
   attribution: 'GLAD Alerts &copy; UMD/GLAD',
 });
 const treeLossColorLayer = L.layerGroup();
+
+// Canvas-based heatmap layer.  This is deliberately separate from the raw
+// Hansen tile layer: the tiles show individual loss pixels, whereas this
+// layer summarizes the results for the selected analysis area.
+let heatmapCanvas = null;
+let heatmapLayer  = null;
+const WEB_MERCATOR_LIMIT = 85.05112878;
+
+function clearHeatmapLayer() {
+  if (heatmapLayer) { map.removeLayer(heatmapLayer); heatmapLayer = null; }
+  heatmapCanvas = null;
+}
+
+function renderHeatmap(lat, lng, rows) {
+  clearHeatmapLayer();
+  const radiusKm = Math.max(1, parseInt($radiusInput?.value || '500', 10) || 1);
+  const validRows = rows
+    .map(row => ({ ...row, ha: Number(row.ha) || 0 }))
+    .filter(row => row.ha > 0);
+  const totalHa  = validRows.reduce((sum, row) => sum + row.ha, 0);
+  if (totalHa < 0.01) return;
+
+  const size   = 1024;
+  const canvas = document.createElement('canvas');
+  canvas.width  = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+
+  const maxHa  = Math.max(...validRows.map(row => row.ha), 0.01);
+  const cx     = size / 2;
+  const cy     = size / 2;
+
+  // Seeded-random for consistent hotspot placement
+  const seed = Math.abs(Math.round(lat * 1000 + lng * 7));
+  function seededRand(i) {
+    const x = Math.sin(seed + i * 9973) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  // Generate scattered hotspot points for each year's loss
+  const sortedRows = [...validRows].sort((a, b) => b.ha - a.ha);
+  let spotIdx = 0;
+  sortedRows.forEach((row, ri) => {
+    if (row.ha < 0.01) return;
+    const intensity = row.ha / maxHa;
+    // Number of spots proportional to loss
+    const numSpots = Math.max(2, Math.ceil(intensity * 12));
+    for (let s = 0; s < numSpots; s++) {
+      const angle  = seededRand(spotIdx * 3) * Math.PI * 2;
+      const dist   = seededRand(spotIdx * 3 + 1) * cx * 0.78;
+      const px     = cx + Math.cos(angle) * dist;
+      const py     = cy + Math.sin(angle) * dist;
+      const spotR  = Math.max(40, cx * 0.15 * intensity + cx * 0.08 * seededRand(spotIdx * 3 + 2));
+      const alpha  = 0.25 + intensity * 0.55;
+
+      const grad = ctx.createRadialGradient(px, py, 0, px, py, spotR);
+      // Deforestation palette: red core → orange → yellow → transparent.
+      grad.addColorStop(0,    `rgba(239, 68, 68, ${alpha})`);
+      grad.addColorStop(0.32, `rgba(249, 115, 22, ${alpha * 0.72})`);
+      grad.addColorStop(0.64, `rgba(250, 204, 21, ${alpha * 0.36})`);
+      grad.addColorStop(1,    `rgba(250, 204, 21, 0)`);
+
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, spotR, 0, Math.PI * 2);
+      ctx.fill();
+      spotIdx++;
+    }
+  });
+
+  // Add a large central glow based on total deforestation
+  const totalIntensity = Math.min(totalHa / 100, 1);
+  const centerR = cx * 0.6 * totalIntensity + cx * 0.15;
+  const centerAlpha = 0.15 + totalIntensity * 0.4;
+  const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerR);
+  centerGrad.addColorStop(0,    `rgba(239, 68, 68, ${centerAlpha})`);
+  centerGrad.addColorStop(0.3,  `rgba(249, 115, 22, ${centerAlpha * 0.62})`);
+  centerGrad.addColorStop(0.6,  `rgba(250, 204, 21, ${centerAlpha * 0.26})`);
+  centerGrad.addColorStop(1,    `rgba(250, 204, 21, 0)`);
+  ctx.fillStyle = centerGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, centerR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalCompositeOperation = 'source-over';
+
+  // ImageOverlay uses Web Mercator. Clamp its bounds so a valid heatmap is
+  // produced for every allowed coordinate, including high-latitude searches.
+  const centerLat = clamp(Number(lat) || 0, -WEB_MERCATOR_LIMIT, WEB_MERCATOR_LIMIT);
+  const centerLng = normalizeLng(Number(lng) || 0);
+  const latDelta = radiusKm / 111.32;
+  const lngDelta = Math.min(179.9, radiusKm / (111.32 * Math.max(Math.cos(centerLat * Math.PI / 180), 0.08)));
+  const bounds = [
+    [clamp(centerLat - latDelta, -WEB_MERCATOR_LIMIT, WEB_MERCATOR_LIMIT), centerLng - lngDelta],
+    [clamp(centerLat + latDelta, -WEB_MERCATOR_LIMIT, WEB_MERCATOR_LIMIT), centerLng + lngDelta],
+  ];
+  heatmapCanvas = canvas;
+  heatmapLayer  = L.imageOverlay(canvas.toDataURL('image/png'), bounds, {
+    opacity: 0.9,
+    interactive: false,
+    zIndex: 450,
+  });
+  heatmapLayer.addTo(map);
+  requestAnimationFrame(() => heatmapLayer?.bringToFront());
+}
+
+// =============================================
+// REAL-DATA HEATMAP TILE LAYER (CORS-safe)
+//
+// First attempt at this ported the zip build's per-pixel canvas approach
+// (process-pixels.ts / createProcessedLayer in MapCanvas.tsx), which reads
+// each tile's pixels with ctx.getImageData() and recolors them. That only
+// works because the React build proxies every tile through its own
+// same-origin backend route (/api/tiles) first. This static build has no
+// backend, tiles.globalforestwatch.org does not send back
+// Access-Control-Allow-Origin, so getImageData() threw a SecurityError on
+// every tile and the layer silently fell back to drawing the plain,
+// unprocessed tile — which is why it visually looked identical to the
+// "dots" mode.
+//
+// Fix: don't touch pixel data at all. Put the raw loss tiles in their own
+// Leaflet pane and apply a CSS filter (blur + saturate + hue-rotate) to
+// that pane. CSS filters have no CORS restriction whatsoever — they work
+// on cross-origin images exactly like same-origin ones — and applying the
+// filter to the whole pane (rather than per-tile) blurs smoothly across
+// tile seams instead of stopping at each 256px edge. This still uses the
+// real Hansen loss data, it's just styled instead of pixel-processed.
+// =============================================
+map.createPane('heatmapPane');
+const heatmapPaneEl = map.getPane('heatmapPane');
+heatmapPaneEl.style.zIndex = 450;
+heatmapPaneEl.classList.add('fw-heatmap-pane');
+
+const treeLossHeatmapLayer = L.tileLayer(
+  'https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.11/tcd_30/{z}/{x}/{y}.png',
+  {
+    pane: 'heatmapPane',
+    maxZoom: 12,
+    maxNativeZoom: 12,
+    opacity: 0.95,
+    attribution: 'Tree Cover Loss Heatmap &copy; UMD/Hansen/Google/USGS/NASA',
+  }
+);
 
 // Add default layers to map
 satelliteBase.addTo(map);
@@ -209,9 +354,15 @@ const $steps = [1,2,3,4].map(i => $(`step-${i}`));
 $radiusInput.addEventListener('input', () => {
   const val = $radiusInput.value;
   $radiusDisplay.textContent = `${val} km`;
-  const pct = ((val - 1) / (50 - 1)) * 100;
+  const pct = ((val - 1) / (500 - 1)) * 100;
   $radiusInput.style.background = `linear-gradient(to right, #00e676 0%, #00e676 ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
 });
+
+// init slider fill at 500 km
+(function () {
+  const pct = ((500 - 1) / (500 - 1)) * 100;
+  $radiusInput.style.background = `linear-gradient(to right, #00e676 0%, #00e676 ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+})();
 
 // =============================================
 // MAP CLICK — fills coords
@@ -787,9 +938,26 @@ function syncTreeLossLayer() {
   const enabled = $('toggle-tree-loss')?.checked ?? true;
   map.removeLayer(treeLossLayer);
   map.removeLayer(treeLossColorLayer);
+  map.removeLayer(treeLossHeatmapLayer);
+  clearHeatmapLayer();
   if (!enabled) return;
 
-  if (getTreeLossMode() === 'color') {
+  const mode = getTreeLossMode();
+
+  if (mode === 'heatmap') {
+    // Real heatmap: the actual Hansen loss tiles, everywhere on the map,
+    // styled into a glowing heat effect via CSS filter on their pane
+    // (see the "fw-heatmap-pane" rule in style.css) — CORS-safe, no canvas
+    // pixel reads involved.
+    map.addLayer(treeLossHeatmapLayer);
+    // Plus the existing synthetic glow highlighting the analyzed area.
+    if (latestLossCenter && latestLossRows.length) {
+      renderHeatmap(latestLossCenter.lat, latestLossCenter.lng, latestLossRows);
+    }
+    return;
+  }
+
+  if (mode === 'color') {
     if (!treeLossColorLayer.getLayers().length && latestLossCenter && latestLossRows.length) {
       renderTreeLossColorForm(latestLossCenter.lat, latestLossCenter.lng, latestLossRows);
     }
@@ -797,6 +965,7 @@ function syncTreeLossLayer() {
     return;
   }
 
+  // dots (default GFW tile)
   map.addLayer(treeLossLayer);
 }
 
@@ -929,6 +1098,7 @@ function clearMapLayers() {
   latestLossRows = [];
   latestLossCenter = null;
   treeLossColorLayer.clearLayers();
+  clearHeatmapLayer();
 }
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -952,6 +1122,32 @@ function formatDate(value) {
   });
 }
 
+// =============================================
+// 3D GLOBE
+// =============================================
+// Globe layer state
+let globeTreeLossVisible = false;
+let globeGladVisible     = false;
+
+function updateGlobeLayers() {
+  if (!globeScene) return;
+  // Tree loss overlay sphere
+  const tlMesh = globeScene.scene.getObjectByName('treeLoss');
+  if (tlMesh) tlMesh.visible = globeTreeLossVisible;
+  // GLAD overlay sphere
+  const gladMesh = globeScene.scene.getObjectByName('gladAlerts');
+  if (gladMesh) gladMesh.visible = globeGladVisible;
+}
+
+function setTextureColorSpace(texture) {
+  // Three r152+ uses colorSpace; retaining the guard makes this work with
+  // older cached copies of Three as well.
+  if (texture && 'colorSpace' in texture && THREE.SRGBColorSpace) {
+    texture.colorSpace = THREE.SRGBColorSpace;
+  }
+  return texture;
+}
+
 function initGlobe() {
   if (globeScene || typeof THREE === 'undefined') return;
   const width = $globeContainer.clientWidth || window.innerWidth;
@@ -964,19 +1160,105 @@ function initGlobe() {
   renderer.setSize(width, height);
   $globeContainer.appendChild(renderer.domElement);
 
+  const loader = new THREE.TextureLoader();
+  loader.crossOrigin = 'anonymous';
+
+  // Base earth sphere
   const earth = new THREE.Mesh(
     new THREE.SphereGeometry(1, 64, 64),
     new THREE.MeshPhongMaterial({
-      map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
+      map: setTextureColorSpace(loader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg')),
       specular: new THREE.Color('#223344'),
       shininess: 12,
     })
   );
+  earth.name = 'earth';
   scene.add(earth);
+
+  // ── Correctly project global GFW tiles onto the sphere ───────────────
+  // A GFW z=0 tile is Web Mercator, while SphereGeometry UVs are
+  // equirectangular. Sampling it with raw UVs shifts alerts north/south.
+  // Convert the sphere latitude to Web Mercator before every lookup.
+  const overlayVertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+  const overlayFragmentShader = `
+    uniform sampler2D tMap;
+    uniform float uOpacity;
+    uniform vec3 uCoreColor;
+    uniform vec3 uMidColor;
+    uniform vec3 uEdgeColor;
+    varying vec2 vUv;
+    void main() {
+      float latitude = (vUv.y - 0.5) * 3.14159265359;
+      float maxMercatorLatitude = radians(85.05112878);
+      if (abs(latitude) > maxMercatorLatitude) discard;
+
+      float mercatorY = 0.5 - log(tan(0.78539816339 + latitude * 0.5)) / 6.28318530718;
+      vec4 texel = texture2D(tMap, vec2(vUv.x, clamp(mercatorY, 0.0, 1.0)));
+      float signal = max(texel.r, max(texel.g, texel.b));
+      if (signal < 0.055) discard;
+
+      // Normalize both source datasets into the same unambiguous
+      // deforestation scale: yellow edge → orange → red centre.
+      float strength = smoothstep(0.055, 0.9, signal);
+      vec3 warmColor = mix(uEdgeColor, uMidColor, smoothstep(0.12, 0.55, strength));
+      warmColor = mix(warmColor, uCoreColor, smoothstep(0.55, 1.0, strength));
+      gl_FragColor = vec4(warmColor, (0.38 + strength * 0.62) * uOpacity);
+    }
+  `;
+
+  const deforestationUniforms = (texture, opacity) => ({
+    tMap: { value: texture },
+    uOpacity: { value: opacity },
+    uCoreColor: { value: new THREE.Color('#ef4444') },
+    uMidColor: { value: new THREE.Color('#f97316') },
+    uEdgeColor: { value: new THREE.Color('#facc15') },
+  });
+
+  // ── Tree Cover Loss overlay ──────────────────────────────────────────
+  const tlTex = setTextureColorSpace(loader.load('https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.11/tcd_30/0/0/0.png'));
+  const tlMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(1.003, 64, 64),
+    new THREE.ShaderMaterial({
+      uniforms: deforestationUniforms(tlTex, 0.88),
+      vertexShader: overlayVertexShader,
+      fragmentShader: overlayFragmentShader,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.FrontSide,
+    })
+  );
+  tlMesh.name    = 'treeLoss';
+  tlMesh.visible = false;
+  earth.add(tlMesh);
+
+  // ── GLAD Alerts overlay ──────────────────────────────────────────────
+  const gladTex = setTextureColorSpace(loader.load('https://tiles.globalforestwatch.org/glad_prod/tiles/0/0/0.png'));
+  const gladMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(1.006, 64, 64),
+    new THREE.ShaderMaterial({
+      uniforms: deforestationUniforms(gladTex, 0.95),
+      vertexShader: overlayVertexShader,
+      fragmentShader: overlayFragmentShader,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.FrontSide,
+    })
+  );
+  gladMesh.name    = 'gladAlerts';
+  gladMesh.visible = false;
+  earth.add(gladMesh);
+
   scene.add(new THREE.AmbientLight('#7c93ad', 1.4));
   const sunlight = new THREE.DirectionalLight('#fff1d2', 2.2);
   sunlight.position.set(4, 2, 5);
   scene.add(sunlight);
+
   globeScene = {
     scene,
     camera,
@@ -989,10 +1271,25 @@ function initGlobe() {
     lastPointer: { x: 0, y: 0 },
     autoRotate: true,
   };
+
+  // Sync layer visibility immediately from toggles
+  const tlToggle   = $('toggle-tree-loss');
+  const gladToggle = $('toggle-glad');
+  if (tlToggle)   { globeTreeLossVisible = tlToggle.checked;   tlMesh.visible   = globeTreeLossVisible; }
+  if (gladToggle) { globeGladVisible     = gladToggle.checked; gladMesh.visible = globeGladVisible;   }
+
+  // Mirror layer toggles into globe
+  if (tlToggle)   tlToggle.addEventListener('change', e => { globeTreeLossVisible = e.target.checked; updateGlobeLayers(); });
+  if (gladToggle) gladToggle.addEventListener('change', e => { globeGladVisible = e.target.checked;   updateGlobeLayers(); });
+
   bindGlobeControls();
+
+  // Animation loop — only rotate earth; children follow automatically
   const animate = () => {
     if (!globeScene) return;
-    if (globeScene.autoRotate && !globeScene.isDragging) earth.rotation.y += 0.0015;
+    if (globeScene.autoRotate && !globeScene.isDragging) {
+      earth.rotation.y += 0.0015;
+    }
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   };
