@@ -1,4 +1,4 @@
-﻿/* =============================================
+/* =============================================
    ForestWatch — Design System
    Dark Glassmorphic Theme
    ============================================= */
@@ -76,6 +76,16 @@ html, body {
 #globe-container.is-dragging { cursor: grabbing; }
 
 .leaflet-container { background: #0a1628; }
+
+/* Heatmap mode: recolors the raw Hansen tree-loss tiles into a blurred
+   red/orange/yellow glow entirely with CSS (no canvas pixel access, so it
+   works regardless of the tile server's CORS headers). Filtering the whole
+   pane rather than each tile blurs smoothly across tile seams. */
+.fw-heatmap-pane {
+  filter: blur(7px) saturate(3.2) hue-rotate(-8deg) brightness(1.4) contrast(1.15);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
 
 /* Custom leaflet popup */
 .leaflet-popup-content-wrapper {
@@ -994,6 +1004,12 @@ html, body {
   outline: none;
   cursor: pointer;
   transition: var(--transition);
+}
+
+.layer-select-control select option {
+  background: #0a1628;
+  color: #e8f0fe;
+  font-weight: 500;
 }
 
 .layer-select-control select:hover,
