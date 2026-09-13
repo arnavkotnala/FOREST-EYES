@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -57,11 +57,11 @@
       </div>
       <div class="input-group">
         <label for="radius-input">Analysis Radius (km)</label>
-        <input type="range" id="radius-input" min="1" max="50" value="10" />
+        <input type="range" id="radius-input" min="1" max="500" value="500" />
         <div class="range-label">
           <span>1 km</span>
-          <span id="radius-display" class="range-value">10 km</span>
-          <span>50 km</span>
+          <span id="radius-display" class="range-value">500 km</span>
+          <span>500 km</span>
         </div>
       </div>
       <button class="btn-primary" id="analyze-btn">
@@ -200,6 +200,7 @@
       <select id="tree-loss-mode">
         <option value="dots">Dot form</option>
         <option value="color">Colour form</option>
+        <option value="heatmap">Heatmap</option>
       </select>
     </div>
     <label class="layer-toggle">
