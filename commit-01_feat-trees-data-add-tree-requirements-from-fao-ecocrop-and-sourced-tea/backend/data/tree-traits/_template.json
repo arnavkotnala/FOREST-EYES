@@ -1,0 +1,31 @@
+{
+  "id": "",
+  "scientific": "",
+  "name": "",
+  "localName": "",
+  "family": "",
+  "checkedBy": "",
+  "fields": {
+    "annualRainfallMm": { "value": { "min": null, "max": null }, "unit": "mm", "source": { "title": "", "author": "", "year": null, "edition": "", "page": "", "url": "" }, "quote": "" },
+    "meanAnnualTempC": { "value": { "min": null, "max": null }, "unit": "°C", "source": { "title": "", "page": "" }, "quote": "" },
+    "absMinTempC": { "value": null, "unit": "°C", "source": { "title": "", "page": "" }, "quote": "" },
+    "absMaxTempC": { "value": null, "unit": "°C", "source": { "title": "", "page": "" }, "quote": "" },
+    "altitudeM": { "value": { "min": null, "max": null }, "unit": "m", "source": { "title": "", "page": "" }, "quote": "" },
+    "soilPh": { "value": { "min": null, "max": null }, "unit": "pH", "source": { "title": "", "page": "" }, "quote": "" },
+    "soilTexture": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "light": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "leafHabit": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "heightM": { "value": null, "unit": "m", "source": { "title": "", "page": "" }, "quote": "" },
+    "growthRate": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "droughtTolerance": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "frostTolerance": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "rootSystem": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "nitrogenFixing": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "uses": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "wildlifeValue": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "pollutionTolerance": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "invasiveRisk": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "plantingSeason": { "value": null, "source": { "title": "", "page": "" }, "quote": "" },
+    "propagation": { "value": null, "source": { "title": "", "page": "" }, "quote": "" }
+  }
+}
