@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Earth Intelligence Platform — Forest Eyes ⇄ River Eyes</title>
+  <meta name="description" content="Unified Planetary Intelligence Suite: Forest Eyes (Deforestation & 3D Earth) and River Eyes (Hydrology & Dam Siting) with cinematic fluid-nature transition engine." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>" />
+
+  <!-- Google Fonts: Inter, Outfit, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="transition.css?v=20261014" />
+  <style>
+    /* Mode switch: one row in the empty centre of both apps' 60 px top bars */
+    .mode-switch {
+      position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 10000;
+      height: 44px; display: flex; align-items: center; gap: 8px;
+      padding: 4px; border-radius: 12px;
+      background: rgba(10, 16, 30, 0.85); border: 1px solid rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      font: 600 14px/1 'Inter', system-ui, sans-serif; color: #e2e8f0; white-space: nowrap;
+    }
+    .mode-tabs { display: flex; gap: 3px; height: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 9px; padding: 3px; }
+    .mode-tab {
+      appearance: none; border: 0; cursor: pointer; padding: 0 16px; border-radius: 7px;
+      background: transparent; color: #94a3b8; font: inherit; display: inline-flex; align-items: center; gap: 7px;
+      transition: background .2s, color .2s;
+    }
+    .mode-tab:hover { color: #f8fafc; }
+    .mode-tab.active[data-mode="forest"] { background: #059669; color: #fff; }
+    .mode-tab.active[data-mode="river"] { background: #0284c7; color: #fff; }
+    .mode-tab:focus-visible, .lens-check:focus-within { outline: 2px solid #38bdf8; outline-offset: 1px; }
+    .lens-check {
+      display: inline-flex; align-items: center; gap: 8px; height: 100%; padding: 0 12px; border-radius: 9px;
+      cursor: pointer; font-size: 13px; font-weight: 600; color: #94a3b8; user-select: none;
+      border: 1px solid rgba(255, 255, 255, 0.08); transition: color .2s, border-color .2s, background .2s;
+    }
+    .lens-check:hover { color: #e2e8f0; }
+    .lens-check input { accent-color: #38bdf8; width: 15px; height: 15px; margin: 0; cursor: pointer; }
+    .lens-check:has(input:checked) { color: #38bdf8; border-color: rgba(56, 189, 248, 0.5); background: rgba(56, 189, 248, 0.10); }
+    .lens-sub { font-weight: 500; opacity: .75; }
+    @media (max-width: 1560px) { .lens-sub { display: none; } }
+    @media (max-width: 1280px) { .mode-tab { padding: 0 12px; } }
+    @media (max-width: 900px) { .mode-switch { top: auto; bottom: 12px; } }
+
+    .hazard-lens-overlay { position: fixed; inset: 0; z-index: 9999; background: #050811; }
+    .hazard-lens-overlay[hidden] { display: none; }
+    .hazard-lens-overlay iframe { width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       COMPACT MODE SWITCH: Forest ⇄ River, plus the Hazard Lens (Gemma 4) on/off
+       ========================================================================= -->
+  <div class="mode-switch" id="mode-switch">
+    <div class="mode-tabs" role="tablist" aria-label="Platform">
+      <button type="button" class="mode-tab active" id="btn-forest" data-mode="forest" role="tab" aria-selected="true" title="Forest Eyes (T)">🌳 Forest</button>
+      <button type="button" class="mode-tab" id="btn-river" data-mode="river" role="tab" aria-selected="false" title="River Eyes (T)">🌊 River</button>
+    </div>
+    <label class="lens-check" title="Gemma 4 reads satellite images with flood, river and terrain data (Esc to close)">
+      <input type="checkbox" id="lens-toggle" />
+      <span>✦ Hazard Lens <span class="lens-sub">· Gemma 4</span></span>
+    </label>
+  </div>
+
+  <!-- =========================================================================
+       VIEWPORTS: FOREST EYES & RIVER EYES ISOLATED CONTAINERS
+       ========================================================================= -->
+  <main class="viewports-container" id="viewports-container">
+    <!-- Forest Eyes Frame Viewport (Default Active) -->
+    <div class="viewport-frame-wrapper active" id="viewport-forest">
+      <iframe class="viewport-iframe" id="frame-forest" src="forest-eyes/index.html" title="Forest Eyes Platform" loading="eager"></iframe>
+    </div>
+
+    <!-- River Eyes Frame Viewport -->
+    <div class="viewport-frame-wrapper inactive" id="viewport-river">
+      <iframe class="viewport-iframe" id="frame-river" src="river-eyes/index.html" title="River Eyes Platform" loading="eager"></iframe>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       CINEMATIC TRANSITION CANVAS & AMBIENT VIGNETTE OVERLAY
+       ========================================================================= -->
+  <div class="transition-ambient-overlay" id="transition-ambient-overlay"></div>
+  <canvas id="nature-water-transition-canvas"></canvas>
+
+  <!-- Hazard Lens overlay (loaded on first open; the checkbox above turns it on/off) -->
+  <div class="hazard-lens-overlay" id="hazard-lens-overlay" hidden>
+    <iframe id="hazard-lens-frame" title="Hazard Lens"></iframe>
+  </div>
+  <script>
+    (function () {
+      const overlay = document.getElementById('hazard-lens-overlay');
+      const frame = document.getElementById('hazard-lens-frame');
+      const toggle = document.getElementById('lens-toggle');
+      function setLens(on) {
+        const mode = window.currentPlatformMode || 'forest';
+        if (on && !frame.src) frame.src = `hazard/index.html?mode=${mode}`;
+        else if (on) frame.contentWindow?.postMessage({ type: 'hazard-mode', mode }, location.origin);
+        overlay.hidden = !on;
+        toggle.checked = on;
+      }
+      window.setHazardLens = setLens;
+      toggle.addEventListener('change', () => setLens(toggle.checked));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') setLens(false); });
+      window.addEventListener('message', e => {
+        if (e.origin === location.origin && e.data?.type === 'close-hazard-lens') setLens(false);
+      });
+    })();
+  </script>
+
+  <!-- Transition Engine & UI Controller Scripts -->
+  <script src="transition.js?v=20261015_birds_bigfish"></script>
+  <script>
+    (function() {
+      // Current active platform mode: 'forest' or 'river'
+      let currentMode = 'forest';
+      let isTransitioning = false;
+
+      // Elements
+      const btnForest = document.getElementById('btn-forest');
+      const btnRiver = document.getElementById('btn-river');
+
+      const viewportForest = document.getElementById('viewport-forest');
+      const viewportRiver = document.getElementById('viewport-river');
+      const frameForest = document.getElementById('frame-forest');
+      const frameRiver = document.getElementById('frame-river');
+
+      // Initialize Canvas FX Engine
+      const transitionEngine = new NatureWaterTransition('nature-water-transition-canvas');
+      window.transitionEngine = transitionEngine;
+
+      // Mode Switch Coordinator
+      function switchMode(targetMode) {
+        // Picking Forest or River always returns from the Hazard Lens
+        if (window.setHazardLens) window.setHazardLens(false);
+        if (targetMode === currentMode || isTransitioning) return;
+        isTransitioning = true;
+
+        if (targetMode === 'river') {
+          // FOREST ➔ RIVER: screen floods with water
+          transitionEngine.floodToRiver(
+            () => { applyViewportSwitch('river'); },   // midpoint: screen fully covered
+            () => { isTransitioning = false; }          // complete
+          );
+        } else if (targetMode === 'forest') {
+          // RIVER ➔ FOREST: canopy covers the screen
+          transitionEngine.treesAbsorbToForest(
+            () => { applyViewportSwitch('forest'); },
+            () => { isTransitioning = false; }
+          );
+        }
+      }
+      window.switchMode = switchMode;
+
+      function applyViewportSwitch(newMode) {
+        currentMode = newMode;
+        window.currentPlatformMode = newMode; // the Hazard Lens picks its demo places from this
+        const river = newMode === 'river';
+
+        viewportForest.classList.toggle('active', !river);
+        viewportForest.classList.toggle('inactive', river);
+        viewportRiver.classList.toggle('active', river);
+        viewportRiver.classList.toggle('inactive', !river);
+
+        btnForest.classList.toggle('active', !river);
+        btnForest.setAttribute('aria-selected', String(!river));
+        btnRiver.classList.toggle('active', river);
+        btnRiver.setAttribute('aria-selected', String(river));
+
+        // Tell each app whether it is on screen (Forest Eyes pauses its 3D globe when hidden)
+        try {
+          frameForest.contentWindow?.postMessage({ type: 'app-visibility', visible: !river }, location.origin);
+          frameRiver.contentWindow?.postMessage({ type: 'app-visibility', visible: river }, location.origin);
+        } catch (e) {}
+
+        // Leaflet maps need a resize after their frame becomes visible
+        try {
+          const frame = river ? frameRiver : frameForest;
+          if (frame.contentWindow && frame.contentWindow.map) frame.contentWindow.map.invalidateSize();
+        } catch (e) {}
+      }
+
+      // Deep links: index.html#river opens River Eyes, #lens opens the Hazard Lens
+      if (location.hash === '#river') applyViewportSwitch('river');
+      if (location.hash === '#lens' && window.setHazardLens) window.setHazardLens(true);
+
+      // Click Event Listeners
+      btnForest.addEventListener('click', () => switchMode('forest'));
+      btnRiver.addEventListener('click', () => switchMode('river'));
+
+      // Keyboard Shortcut 'T' to toggle, '1' for River Big Fish preview, '2' for Forest Birds preview
+      window.addEventListener('keydown', (e) => {
+        // Ignore if user is typing in an input or textarea
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        if (e.key === 't' || e.key === 'T') {
+          const nextMode = currentMode === 'forest' ? 'river' : 'forest';
+          switchMode(nextMode);
+        } else if (e.key === '1') {
+          transitionEngine.renderPreview('river', 0.65);
+        } else if (e.key === '2') {
+          transitionEngine.renderPreview('forest', 0.40);
+        } else if (e.key === 'Escape') {
+          transitionEngine.canvas.style.display = 'none';
+        }
+      });
+
+      // Listen for postMessage from inside iframes if needed
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'SWITCH_PLATFORM_MODE') {
+          switchMode(e.data.mode);
+        }
+        // A pop-up inside an app (Forest Eyes tree planner) blurs only its own frame: hide the switch above it
+        if (e.origin === location.origin && e.data && e.data.type === 'APP_MODAL') {
+          const sw = document.getElementById('mode-switch');
+          sw.style.visibility = e.data.open ? 'hidden' : '';
+          sw.toggleAttribute('inert', !!e.data.open);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
