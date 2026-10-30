@@ -301,7 +301,7 @@
         <span class="lvl ${esc(a.overall_level)}">Overall: ${levelText(a.overall_level)}</span>
         <p class="headline">${esc(a.headline)}</p>
         <div class="meta">${(r.tookMs / 1000).toFixed(0)} s${r.aiError ? ` · AI error: ${esc(r.aiError)}` : ''}</div>
-        ${r.readingSource !== 'gemma' ? '<button type="button" class="retry" id="retry">↻ Retry with Gemma 4</button>' : ''}
+        ${r.readingSource !== 'gemma' ? '<button type="button" class="retry" id="retry">↻ refresh</button>' : ''}
       </div>`;
       if (a.hazards.length) {
         html += `<div class="card reading-card"><h2>Hazards</h2>${a.hazards.map(h => `
