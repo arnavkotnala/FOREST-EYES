@@ -1094,5 +1094,1201 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- Clean Front-End Application Architecture -->
+  <script>
+    // =========================================================================
+    // GLOBAL RIVER CATALOG & HIGH-PRECISION VECTOR REGISTRY
+    // =========================================================================
+    const WORLD_RIVERS_REGISTRY = {
+      ganga: {
+        id: 'ganga',
+        name: 'Ganga (Ganges)',
+        basin: 'Ganga Basin',
+        lengthKm: 2525,
+        dischargeCumecs: 16650,
+        catchmentSqKm: 861452,
+        centerCoords: [26.85, 80.95],
+        zoom: 6,
+        strokeColor: '#3b82f6',
+        path: [
+          [30.92, 79.08], [30.55, 78.69], [30.145, 78.598], [30.104, 78.298],
+          [29.956, 78.170], [29.800, 78.120], [29.350, 78.150], [28.900, 78.300],
+          [28.450, 78.580], [27.900, 79.150], [27.420, 79.620], [27.052, 79.924],
+          [26.800, 80.180], [26.435, 80.395], [26.100, 80.820], [25.750, 81.350],
+          [25.429, 81.884], [25.180, 82.550], [25.289, 83.006], [25.550, 83.420],
+          [25.560, 83.980], [25.680, 84.650], [25.620, 85.180], [25.400, 85.950],
+          [25.320, 86.600], [25.220, 87.250], [24.800, 87.900], [24.500, 88.150],
+          [23.900, 88.350], [23.200, 88.420], [22.570, 88.360], [21.750, 88.180]
+        ]
+      },
+      yamuna: {
+        id: 'yamuna',
+        name: 'Yamuna River',
+        basin: 'Ganga Basin',
+        lengthKm: 1376,
+        dischargeCumecs: 2950,
+        catchmentSqKm: 366223,
+        centerCoords: [28.61, 77.23],
+        zoom: 7,
+        strokeColor: '#06b6d4',
+        path: [
+          [31.02, 78.45], [30.78, 78.15], [30.505, 77.795], [30.300, 77.600],
+          [29.950, 77.400], [29.500, 77.200], [29.050, 77.150], [28.712, 77.228],
+          [28.658, 77.248], [28.544, 77.311], [28.250, 77.450], [27.500, 77.680],
+          [27.300, 77.850], [27.180, 78.040], [26.850, 78.600], [26.400, 79.250],
+          [26.000, 80.050], [25.750, 80.850], [25.429, 81.884]
+        ]
+      },
+      amazon: {
+        id: 'amazon',
+        name: 'Amazon River',
+        basin: 'Amazon Basin',
+        lengthKm: 6400,
+        dischargeCumecs: 209000,
+        catchmentSqKm: 6915000,
+        centerCoords: [-3.46, -62.21],
+        zoom: 5,
+        strokeColor: '#10b981',
+        path: [
+          [-15.52, -71.68], [-12.45, -73.20], [-8.75, -73.55], [-4.50, -73.80],
+          [-3.75, -73.25], [-4.20, -70.05], [-3.20, -68.10], [-3.40, -65.05],
+          [-3.46, -62.21], [-3.15, -60.02], [-2.50, -58.45], [-2.25, -55.20],
+          [-2.40, -54.70], [-1.50, -52.00], [-0.05, -51.05], [0.50, -50.00]
+        ]
+      },
+      nile: {
+        id: 'nile',
+        name: 'Nile River',
+        basin: 'Nile Basin',
+        lengthKm: 6650,
+        dischargeCumecs: 2830,
+        catchmentSqKm: 3254555,
+        centerCoords: [18.25, 32.55],
+        zoom: 5,
+        strokeColor: '#f59e0b',
+        path: [
+          [-2.25, 31.75], [0.35, 32.55], [2.80, 32.30], [4.85, 31.60],
+          [7.50, 31.55], [9.50, 30.25], [15.60, 32.55], [17.80, 33.80],
+          [18.55, 32.85], [19.30, 31.85], [19.80, 30.50], [21.90, 31.25],
+          [24.08, 32.85], [25.70, 32.65], [26.80, 31.75], [29.80, 31.20],
+          [30.05, 31.24], [31.25, 31.35], [31.50, 31.85]
+        ]
+      },
+      yangtze: {
+        id: 'yangtze',
+        name: 'Yangtze River (Chang Jiang)',
+        basin: 'Yangtze Basin',
+        lengthKm: 6300,
+        dischargeCumecs: 30166,
+        catchmentSqKm: 1800000,
+        centerCoords: [30.75, 111.28],
+        zoom: 5,
+        strokeColor: '#8b5cf6',
+        path: [
+          [33.45, 91.15], [33.80, 94.50], [32.90, 97.20], [31.20, 98.50],
+          [28.50, 99.85], [26.85, 100.25], [26.15, 102.50], [28.75, 104.60],
+          [29.55, 106.55], [31.05, 109.50], [30.75, 111.28], [29.90, 112.50],
+          [30.55, 114.30], [29.80, 116.00], [31.35, 118.40], [32.20, 119.45],
+          [31.40, 121.48], [31.50, 122.20]
+        ]
+      },
+      mississippi: {
+        id: 'mississippi',
+        name: 'Mississippi River',
+        basin: 'Mississippi-Missouri Basin',
+        lengthKm: 3770,
+        dischargeCumecs: 16792,
+        catchmentSqKm: 2981076,
+        centerCoords: [35.15, -90.05],
+        zoom: 5,
+        strokeColor: '#38bdf8',
+        path: [
+          [47.20, -95.20], [45.60, -94.20], [44.95, -93.25], [43.80, -91.80],
+          [41.50, -90.55], [40.40, -91.35], [38.60, -90.20], [37.00, -89.15],
+          [36.20, -89.60], [35.15, -90.05], [33.40, -91.15], [31.55, -91.40],
+          [30.45, -91.18], [29.95, -90.07], [29.20, -89.25]
+        ]
+      },
+      danube: {
+        id: 'danube',
+        name: 'Danube River',
+        basin: 'Danube Basin',
+        lengthKm: 2850,
+        dischargeCumecs: 6500,
+        catchmentSqKm: 801463,
+        centerCoords: [45.26, 19.83],
+        zoom: 6,
+        strokeColor: '#6366f1',
+        path: [
+          [48.05, 8.20], [48.40, 10.00], [48.75, 11.60], [49.00, 12.10],
+          [48.55, 13.45], [48.30, 14.30], [48.20, 16.35], [48.15, 17.10],
+          [47.80, 18.75], [47.50, 19.05], [46.20, 18.95], [45.26, 19.83],
+          [44.82, 20.45], [44.70, 21.70], [44.60, 22.65], [43.70, 24.00],
+          [43.90, 26.00], [44.20, 27.95], [45.20, 28.80], [45.30, 29.65]
+        ]
+      },
+      rhine: {
+        id: 'rhine',
+        name: 'Rhine River',
+        basin: 'Rhine Basin',
+        lengthKm: 1230,
+        dischargeCumecs: 2900,
+        catchmentSqKm: 185000,
+        centerCoords: [50.15, 7.60],
+        zoom: 7,
+        strokeColor: '#0ea5e9',
+        path: [
+          [46.65, 8.70], [47.05, 9.50], [47.50, 9.60], [47.65, 8.60],
+          [47.55, 7.60], [48.60, 7.85], [49.00, 8.40], [49.50, 8.45],
+          [50.00, 8.25], [50.15, 7.60], [50.35, 7.60], [50.75, 7.10],
+          [50.95, 6.95], [51.25, 6.75], [51.85, 6.15], [51.90, 4.50]
+        ]
+      },
+      congo: {
+        id: 'congo',
+        name: 'Congo River',
+        basin: 'Congo Basin',
+        lengthKm: 4700,
+        dischargeCumecs: 41200,
+        catchmentSqKm: 4014500,
+        centerCoords: [-1.65, 20.85],
+        zoom: 5,
+        strokeColor: '#14b8a6',
+        path: [
+          [-11.50, 26.50], [-9.00, 25.80], [-5.00, 26.90], [-2.50, 26.00],
+          [0.50, 25.20], [1.80, 23.50], [2.10, 20.85], [0.05, 18.15],
+          [-2.00, 16.20], [-4.30, 15.30], [-5.10, 14.50], [-5.85, 13.00],
+          [-6.05, 12.30]
+        ]
+      },
+      brahmaputra: {
+        id: 'brahmaputra',
+        name: 'Brahmaputra River',
+        basin: 'Ganga-Brahmaputra Basin',
+        lengthKm: 3969,
+        dischargeCumecs: 19800,
+        catchmentSqKm: 712035,
+        centerCoords: [26.18, 91.75],
+        zoom: 6,
+        strokeColor: '#2563eb',
+        path: [
+          [30.50, 82.00], [29.50, 85.00], [29.25, 89.00], [29.30, 91.50],
+          [29.50, 94.00], [29.80, 95.20], [29.40, 95.80], [28.10, 95.30],
+          [27.20, 94.50], [26.60, 92.80], [26.18, 91.75], [26.15, 90.50],
+          [25.50, 89.85], [24.50, 89.60], [23.20, 90.60], [22.20, 90.80]
+        ]
+      },
+      indus: {
+        id: 'indus',
+        name: 'Indus River',
+        basin: 'Indus Basin',
+        lengthKm: 3180,
+        dischargeCumecs: 6600,
+        catchmentSqKm: 1165000,
+        centerCoords: [31.50, 71.00],
+        zoom: 6,
+        strokeColor: '#0284c7',
+        path: [
+          [31.40, 81.30], [32.50, 79.50], [34.20, 77.50], [35.30, 75.80],
+          [35.50, 74.50], [35.20, 73.50], [34.20, 72.90], [33.90, 72.35],
+          [32.50, 71.50], [31.50, 71.00], [29.50, 70.70], [28.00, 69.20],
+          [26.00, 68.60], [24.80, 68.30], [24.00, 67.50]
+        ]
+      },
+      mekong: {
+        id: 'mekong',
+        name: 'Mekong River (Lancang)',
+        basin: 'Mekong Basin',
+        lengthKm: 4350,
+        dischargeCumecs: 14500,
+        catchmentSqKm: 795000,
+        centerCoords: [16.00, 104.50],
+        zoom: 6,
+        strokeColor: '#059669',
+        path: [
+          [33.10, 94.20], [31.20, 97.50], [27.80, 99.20], [25.20, 100.50],
+          [22.00, 100.90], [20.30, 101.20], [18.00, 102.10], [17.90, 102.60],
+          [16.00, 104.50], [15.10, 105.80], [13.50, 106.00], [11.55, 105.00],
+          [10.50, 105.80], [9.80, 106.50]
+        ]
+      }
+    };
+
+    // =========================================================================
+    // MAP & VIEW STATE INITIALIZATION
+    // =========================================================================
+    let map = null;
+    let riverPolylines = {};
+    let damMarkers = [];
+    let activeRiverId = 'ganga';
+
+    function initMap() {
+      const container = document.getElementById('map-container');
+      if (!container || map) return;
+
+      const r = WORLD_RIVERS_REGISTRY[activeRiverId];
+      map = L.map('map-container', {
+        center: r.centerCoords,
+        zoom: r.zoom,
+        minZoom: 2,
+        zoomControl: false,
+        attributionControl: false,
+        // Show the world once: no repeated copies to the left/right with missing rivers
+        maxBounds: [[-85, -180], [85, 180]],
+        maxBoundsViscosity: 1.0,
+        preferCanvas: true,
+      });
+
+      L.control.zoom({ position: 'topleft' }).addTo(map);
+
+      // Basemaps: dark for overview, satellite to inspect dam sites
+      const darkBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 16, noWrap: true
+      }).addTo(map);
+      const satelliteBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18, noWrap: true
+      });
+      window.showSatellite = () => { if (!map.hasLayer(satelliteBase)) { map.removeLayer(darkBase); satelliteBase.addTo(map); } };
+
+      // All rivers from HydroRIVERS, as switchable categories under the basemap choice
+      const riverOverlays = initRiverNetwork();
+      L.control.layers({ 'Dark': darkBase, 'Satellite': satelliteBase }, riverOverlays, { position: 'topleft', collapsed: false }).addTo(map);
+
+      // Highlighted rivers of the basin selector, drawn on top
+      drawWorldRiverPolylines();
+
+      // River picking (hover highlight, click scans) takes over the map while active
+      map.on('mousemove', onPickMove);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && pickMode) setPickMode(false); });
+
+      // Click on the map: choose the site for Site Conditions and Water Quality
+      map.on('click', function(e) {
+        if (pickMode) { onPickClick(); return; }
+        loadSiteConditions(e.latlng.lat, e.latlng.lng, `Clicked site (${e.latlng.lat.toFixed(2)}, ${e.latlng.lng.toFixed(2)})`);
+
+      });
+    }
+
+    // River network (server: rivers.js network()), split into categories the user can switch on/off.
+    // Category = line width class on the server, by catchment area. Reloads for the visible area.
+    function initRiverNetwork() {
+      const renderer = L.canvas({ padding: 0.5 });
+      const CATEGORIES = [
+        { key: 'major', classes: [5, 4], label: 'Major rivers', hint: '≥ 100,000 km²', on: true, style: { color: '#38bdf8', weight: 2.6, opacity: 0.95 } },
+        { key: 'large', classes: [3], label: 'Large rivers', hint: '20,000–100,000 km²', on: true, style: { color: '#38bdf8', weight: 1.5, opacity: 0.75 } },
+        { key: 'medium', classes: [2], label: 'Medium rivers', hint: '2,000–20,000 km²', on: false, style: { color: '#7dd3fc', weight: 0.9, opacity: 0.5 } },
+        { key: 'small', classes: [1], label: 'Small rivers & streams', hint: '< 2,000 km² · India from 100', on: false, style: { color: '#bae6fd', weight: 0.6, opacity: 0.35 } },
+      ];
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem('riverCategories') || 'null'); } catch {}
+      const overlays = {};
+      for (const c of CATEGORIES) {
+        c.layer = L.layerGroup();
+        if (saved ? saved.includes(c.key) : c.on) c.layer.addTo(map);
+        const swatch = `<span style="display:inline-block;width:18px;height:0;border-top:${Math.max(1, c.style.weight)}px solid ${c.style.color};opacity:${c.style.opacity};vertical-align:middle;margin:0 6px 2px 2px;"></span>`;
+        overlays[`${swatch}${c.label} <span style="opacity:.55;font-size:10px;">${c.hint}</span>`] = c.layer;
+      }
+
+      let request = 0, timer = null;
+      async function refresh() {
+        const id = ++request;
+        const active = CATEGORIES.filter(c => map.hasLayer(c.layer));
+        try { localStorage.setItem('riverCategories', JSON.stringify(active.map(c => c.key))); } catch {}
+        CATEGORIES.forEach(c => { if (!active.includes(c)) c.layer.clearLayers(); });
+        if (!active.length) return;
+        const b = map.getBounds();
+        const bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map(v => v.toFixed(2)).join(',');
+        const classes = active.flatMap(c => c.classes).sort().join(',');
+        try {
+          const res = await fetch(`/api/v1/rivers/network?bbox=${bbox}&z=${map.getZoom()}&classes=${classes}`);
+          if (!res.ok || id !== request) return;
+          const net = await res.json();
+          if (id !== request) return;
+          for (const c of active) {
+            c.layer.clearLayers();
+            const lines = c.classes.flatMap(k => net.lines[k] || []);
+            if (lines.length) L.polyline(lines, { renderer, interactive: false, ...c.style }).addTo(c.layer);
+          }
+        } catch {
+          // server not running: keep whatever is drawn
+        }
+      }
+      const later = () => { clearTimeout(timer); timer = setTimeout(refresh, 150); };
+      map.on('moveend overlayadd overlayremove', later);
+      refresh();
+      return overlays;
+    }
+
+    function drawWorldRiverPolylines() {
+      for (const [key, river] of Object.entries(WORLD_RIVERS_REGISTRY)) {
+        const isCurrent = key === activeRiverId;
+        const polyline = L.polyline(river.path, {
+          color: river.strokeColor,
+          weight: isCurrent ? 5 : 2.5,
+          opacity: isCurrent ? 0.95 : 0.45,
+          smoothFactor: 1.0
+        }).addTo(map);
+
+        polyline.bindTooltip(`<strong>${river.name}</strong><br/>${river.basin}`, {
+          sticky: true,
+          className: 'river-tooltip'
+        });
+
+        polyline.on('click', () => switchRiver(key));
+        riverPolylines[key] = polyline;
+      }
+      loadRealRiverGeometry();
+      map.on('moveend', snapRiverHighlights);
+    }
+
+    // Close up (zoom ≥ 9) the traced channels can sit a few hundred metres off the real river,
+    // so the visible part is re-centred on the water (server: water-snap.js, JRC surface water).
+    let snapRequest = 0;
+    async function snapRiverHighlights() {
+      const id = ++snapRequest;
+      const z = map.getZoom();
+      const entries = Object.entries(WORLD_RIVERS_REGISTRY).filter(([k, r]) => r.traced && riverPolylines[k]);
+      if (z < 9) {
+        for (const [k, r] of entries) if (r.snapped) { riverPolylines[k].setLatLngs(r.traced.path); r.snapped = false; }
+        return;
+      }
+      const b = map.getBounds();
+      const bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+      const padX = (bbox[2] - bbox[0]) * 0.25, padY = (bbox[3] - bbox[1]) * 0.25;
+      const inBox = ([la, lo]) => lo >= bbox[0] - padX && lo <= bbox[2] + padX && la >= bbox[1] - padY && la <= bbox[3] + padY;
+      for (const [k, r] of entries) {
+        // the stretches of this river inside the (padded) view, kept as separate pieces
+        const runs = [];
+        let run = [];
+        for (const pt of r.traced.path) {
+          if (inBox(pt)) run.push(pt);
+          else if (run.length) { if (run.length > 1) runs.push(run); run = []; }
+        }
+        if (run.length > 1) runs.push(run);
+        if (!runs.length) continue;
+        try {
+          const res = await fetch('/api/v1/rivers/snap', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lines: runs.slice(0, 20), bbox: [bbox[0] - padX, bbox[1] - padY, bbox[2] + padX, bbox[3] + padY], z }),
+          });
+          if (!res.ok || id !== snapRequest) return;
+          const { lines } = await res.json();
+          if (id !== snapRequest) return;
+          if (lines && lines.length) { riverPolylines[k].setLatLngs(lines); r.snapped = true; }
+        } catch {
+          return; // offline: keep the traced line
+        }
+      }
+    }
+
+    // Swap the hand-drawn sketches for the real channels traced through HydroRIVERS (server: rivers.js)
+    async function loadRealRiverGeometry() {
+      const sketches = Object.fromEntries(Object.entries(WORLD_RIVERS_REGISTRY).map(([k, r]) => [k, r.path]));
+      try {
+        const res = await fetch('/api/v1/rivers/trace', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sketches }),
+        });
+        if (!res.ok) return;
+        const { rivers } = await res.json();
+        for (const [key, traced] of Object.entries(rivers || {})) {
+          const line = riverPolylines[key];
+          if (!traced || !line) continue;
+          line.setLatLngs(traced.path);
+          const r = WORLD_RIVERS_REGISTRY[key];
+          r.traced = traced;
+          if (key === activeRiverId) { renderRiverHud(r); loadRiverSite(r); }
+          line.setTooltipContent(`<strong>${r.name}</strong><br/>${r.basin}<br/><span style="opacity:.7">Channel: HydroRIVERS (${traced.lengthKm.toLocaleString()} km traced)</span>`);
+        }
+        snapRiverHighlights();
+      } catch {
+        // offline / opened as a file: keep the sketch lines
+      }
+    }
+
+    function switchRiver(riverId) {
+      if (!WORLD_RIVERS_REGISTRY[riverId]) return;
+      activeRiverId = riverId;
+      const r = WORLD_RIVERS_REGISTRY[riverId];
+
+      document.getElementById('world-river-select').value = riverId;
+      const atlasLabel = document.getElementById('atlas-selected-label');
+      if (atlasLabel) atlasLabel.textContent = `Scan the ${r.name.split(' (')[0]}`;
+
+      // Update Telemetry HUD
+      renderRiverHud(r);
+
+      // Update Map View
+      if (map) {
+        map.flyTo(r.centerCoords, r.zoom, { duration: 1.5 });
+        for (const [key, line] of Object.entries(riverPolylines)) {
+          if (key === riverId) {
+            line.setStyle({ weight: 5, opacity: 0.95 });
+            line.bringToFront();
+          } else {
+            line.setStyle({ weight: 2.5, opacity: 0.4 });
+          }
+        }
+      }
+
+      // Ground conditions on the river itself (real data, server: site.js)
+      loadRiverSite(r);
+    }
+
+    // =========================================================================
+    // =========================================================================
+    function openDamPlannerTab() {
+      const input = document.getElementById('plan-city');
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.focus();
+      input.select();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const navItem = document.getElementById('nav-' + tabId);
+      if (navItem) navItem.classList.add('active');
+
+      // Close all panels
+      closePanel('dam-planner-panel');
+      closePanel('geotech-panel');
+      closePanel('water-panel');
+
+      if (tabId === 'water') {
+        showWaterSelection();
+        document.getElementById('water-panel').style.display = 'flex';
+      } else if (tabId === 'dam-planner') {
+        document.getElementById('dam-planner-panel').style.display = 'flex';
+      } else if (tabId === 'geotech') {
+        // content is filled by loadSiteConditions() on river switch / map click
+        document.getElementById('geotech-panel').style.display = 'flex';
+      }
+    }
+
+    function closePanel(panelId) {
+      const p = document.getElementById(panelId);
+      if (p) p.style.display = 'none';
+    }
+
+    // River-wide numbers: HydroRIVERS trace when available (else the registry's published figures).
+    function renderRiverHud(r) {
+      const t = r.traced;
+      document.getElementById('hud-length').textContent = t
+        ? `${t.lengthKm.toLocaleString()} km traced`
+        : r.lengthKm.toLocaleString() + ' km';
+      document.getElementById('hud-discharge').textContent = (t ? t.endDischargeCms : r.dischargeCumecs).toLocaleString() + ' m³/s';
+      document.getElementById('hud-catchment').textContent = (t ? t.endUplandKm2 : r.catchmentSqKm).toLocaleString() + ' km²';
+    }
+
+    // A representative point ON the river: middle of the traced channel (centerCoords is only a map
+    // centre, e.g. the Ganga's is Lucknow, which lies on the Gomti).
+    function loadRiverSite(r) {
+      const path = r.traced?.path;
+      const [lat, lon] = path ? path[Math.floor(path.length / 2)] : r.centerCoords;
+      loadSiteConditions(lat, lon, `${r.name}${path ? ' (mid-river)' : ''}`);
+    }
+
+    // Ground conditions at a site — real global data from the server (site.js):
+    // HydroRIVERS + GloFAS flow, SoilGrids soil, USGS earthquakes.
+    let siteRequest = 0;
+    async function loadSiteConditions(lat, lon, label) {
+      selectedSite = { lat, lon, label };
+      showWaterSelection();
+      const id = ++siteRequest;
+      const body = document.getElementById('geotech-panel-body');
+      ['hud-health', 'hud-bearing', 'hud-seismic'].forEach(k => { document.getElementById(k).textContent = '…'; });
+      body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">Loading soil, earthquake and river-flow data for ${escapeHtml(label)}…<br/><span style="color:var(--text-dim)">SoilGrids can take ~20 s.</span></div>`;
+      let d;
+      try {
+        const res = await fetch('/api/v1/site', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lat, lon }),
+        });
+        d = await res.json();
+        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+      } catch (err) {
+        if (id !== siteRequest) return;
+        ['hud-health', 'hud-bearing', 'hud-seismic'].forEach(k => { document.getElementById(k).textContent = 'n/a'; });
+        body.innerHTML = `<div style="color:#fca5a5;font-size:12px;">Site data unavailable: ${escapeHtml(err.message)}. Try again in a moment.</div>`;
+        return;
+      }
+      if (id !== siteRequest) return; // a newer click won
+
+      const f = d.flow, s = d.soil, q = d.earthquakes;
+      document.getElementById('hud-health').textContent = f?.percentOfNormal == null ? 'n/a'
+        : f.matchQuality === 'poor' ? 'uncertain' : `${f.percentOfNormal}%`;
+      document.getElementById('hud-bearing').textContent = s?.hasData ? (s.textureClass || s.wrbGroup || 'see panel') : 'no data';
+      document.getElementById('hud-seismic').textContent = q ? (q.count ? `${q.count} (max M${q.strongest[0].magnitude})` : 'none') : 'n/a';
+
+      const row = (k, v) => `<tr><td style="color:var(--text-dim);padding:3px 8px 3px 0;">${k}</td><td style="text-align:right;font-family:var(--font-mono);color:#fff;">${v}</td></tr>`;
+      const fmt = (v, u = '') => (v === null || v === undefined ? '—' : `${Number(v).toLocaleString()}${u}`);
+
+      body.innerHTML = `
+        <div style="background: var(--bg-deep); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Site</div>
+          <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-top: 2px;">${escapeHtml(label)}</div>
+          <div style="font-size: 11px; color: var(--text-muted);">${d.river ? `Snapped to river ${d.river.distanceFromClickKm} km away · ${fmt(d.river.distanceToMouthKm, ' km')} to the sea` : 'No major river within 30 km'}</div>
+        </div>
+
+        <strong style="color:#fff;font-size:11px;">🌊 River flow</strong>
+        <table style="width:100%;font-size:12px;margin:4px 0 12px;">
+          ${row('Long-term mean (HydroRIVERS)', fmt(d.river?.meanDischargeCms, ' m³/s'))}
+          ${f && f.matchQuality === 'poor' ? row('GloFAS forecast', 'uncertain: its ~5 km grid cell here may be a side stream') : ''}
+          ${f ? row('Today (GloFAS)', `${fmt(f.todayCms, ' m³/s')} · ${fmt(f.percentOfNormal, '%')} of normal for the season`) + row('14-day forecast peak', `${fmt(f.forecastPeakCms, ' m³/s')} (${fmt(f.peakVs2yrFlood)}× 2-yr flood)`) : row('GloFAS forecast', 'unavailable')}
+        </table>
+
+        <strong style="color:#fff;font-size:11px;">🧱 Soil, top 30 cm (SoilGrids)</strong>
+        <table style="width:100%;font-size:12px;margin:4px 0 12px;">
+          ${s?.hasData ? `
+            ${s.textureClass ? row('Texture (USDA)', escapeHtml(s.textureClass)) : ''}
+            ${s.wrbGroup ? row('Soil group (WRB)', escapeHtml(s.wrbGroup)) : ''}
+            ${s.pH != null ? row('pH', fmt(s.pH)) : ''}
+            ${s.distanceKm ? row('Nearest soil data', `${fmt(s.distanceKm, ' km')} away (site is water/urban)`) : ''}
+            ${row('Clay / silt / sand', `${fmt(s.clayPct)} / ${fmt(s.siltPct)} / ${fmt(s.sandPct)} %`)}
+            ${row('Stones (coarse fragments)', fmt(s.coarseFragmentsPct, ' vol%'))}
+            ${row('Bulk density', fmt(s.bulkDensity, ' kg/dm³'))}
+            ${row('Organic carbon', fmt(s.organicCarbonGkg, ' g/kg'))}`
+          : row('Soil data', 'none at this point (water, rock, ice or urban)')}
+        </table>
+
+        <strong style="color:#fff;font-size:11px;">⚠️ Earthquakes M5+ within 150 km since 1970 (USGS)</strong>
+        ${q ? `<div style="font-size:12px;color:var(--text-muted);margin:4px 0;">${q.count} events. Strongest:</div>
+          <ul style="margin:0 0 12px;padding-left:16px;font-size:11px;color:var(--text-muted);">${q.strongest.map(e => `<li><b style="color:#fff;">M${e.magnitude}</b> ${escapeHtml(e.place)} (${e.date})</li>`).join('')}</ul>`
+          : '<div style="font-size:12px;color:var(--text-muted);margin:4px 0 12px;">Unavailable right now.</div>'}
+
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 10px; font-size: 11px; color: #fde68a;">
+          <strong>Not available from global data:</strong>
+          <ul style="margin:4px 0 0;padding-left:16px;">${d.notAvailable.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-dim);">${d.sources.map(escapeHtml).join(' · ')}</div>`;
+    }
+
+    // =========================================================================
+    // WATER QUALITY (Sentinel-2) — server: /api/v1/water-quality (water.js)
+    // Turbidity (Dogliotti 2015) and chlorophyll index (NDCI) of the water at the selected point,
+    // from the newest cloud-free Sentinel-2 images; Gemma 4 reads the satellite image.
+    // =========================================================================
+    let selectedSite = null; // { lat, lon, label } — set by map clicks and river selection
+
+    function showWaterSelection() {
+      const el = document.getElementById('water-selected');
+      if (el) el.innerHTML = selectedSite
+        ? `📍 <b>${escapeHtml(selectedSite.label)}</b>${/-?\d+\.\d+,\s*-?\d+\.\d+/.test(selectedSite.label) ? '' : ` (${selectedSite.lat.toFixed(3)}, ${selectedSite.lon.toFixed(3)})`}<br/><span style="color:var(--text-dim)">Click any river or lake on the map to choose another place.</span>`
+        : 'Click a river or lake on the map first.';
+    }
+
+    async function runWaterQuality() {
+      if (!selectedSite) { showWaterSelection(); return; }
+      const out = document.getElementById('water-results');
+      const btn = document.getElementById('water-run');
+      btn.disabled = true;
+      out.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">🛰️ Finding the newest cloud-free Sentinel-2 images and measuring the water… (~20–40 s)</div>`;
+      let r, error;
+      try {
+        const res = await fetch('/api/v1/water-quality', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat: selectedSite.lat, lon: selectedSite.lon, name: selectedSite.label }),
+        });
+        r = await res.json();
+        if (!res.ok) error = r.error || `HTTP ${res.status}`;
+      } catch {
+        error = 'Could not reach the server. Try again in a moment.';
+      }
+      btn.disabled = false;
+      if (error) {
+        out.innerHTML = `<div style="border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.08);border-radius:8px;padding:10px;font-size:12px;color:#fca5a5;">${escapeHtml(error)}</div>`;
+        return;
+      }
+      renderWaterQuality(r);
+    }
+
+    function renderWaterQuality(r) {
+      const L0 = r.latest;
+      const fnu = v => (v.turbiditySaturated ? '≥ 1,000' : v.turbidityFnu.toLocaleString());
+      const turbColour = v => (v.turbidityFnu < 10 ? '#34d399' : v.turbidityFnu < 50 ? '#a3e635' : v.turbidityFnu < 150 ? '#fbbf24' : v.turbidityFnu < 500 ? '#fb923c' : '#f87171');
+      const chlColour = v => (v.ndci < 0 ? '#34d399' : v.ndci < 0.1 ? '#a3e635' : v.ndci < 0.2 ? '#fbbf24' : '#f87171');
+      const conf = { good: ['#34d399', 'good: plenty of open water measured'], fair: ['#fbbf24', 'fair: limited open water'], low: ['#f87171', 'low: narrow river, pixels mix water and riverbank'] }[L0.confidence];
+      const list = items => `<ul style="margin:4px 0 0;padding-left:16px;font-size:11px;color:var(--text-muted);">${items.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+      const ai = r.reading;
+      const aiTag = !ai ? ''
+        : ai.source === 'gemma' ? `<span style="color:#38bdf8;">✦ Gemma 4 reading (${escapeHtml(ai.model)}) of the satellite image</span>`
+        : '<span style="color:#94a3b8;">✦ AI reading of the satellite image</span>';
+
+      // show the analysed box on the map
+      if (window.waterBoxLayer) map.removeLayer(window.waterBoxLayer);
+      const [w, s, e, n] = r.box;
+      window.waterBoxLayer = L.rectangle([[s, w], [n, e]], { color: '#38bdf8', weight: 2, dashArray: '5 5', fill: false })
+        .bindTooltip('Area measured for water quality').addTo(map);
+
+      document.getElementById('water-results').innerHTML = `
+        <img src="${escapeHtml(L0.imageUrl)}" alt="Sentinel-2 true-colour image of the measured area" loading="lazy"
+             style="width:100%;border-radius:8px;border:1px solid var(--border-subtle);margin-top:4px;aspect-ratio:1;object-fit:cover;background:#0b1220;" />
+        <div style="font-size:10px;color:var(--text-dim);margin:4px 0 8px;">Sentinel-2 · ${L0.date} · ${L0.waterAreaHa} ha of open water measured · confidence <b style="color:${conf[0]}">${conf[1]}</b></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">Turbidity</div>
+            <div style="font-size:18px;font-weight:800;color:${turbColour(L0)};font-family:var(--font-mono);">${fnu(L0)} <span style="font-size:11px;">FNU</span></div>
+            <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(L0.turbidityClass)}</div>
+          </div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">Chlorophyll (NDCI)</div>
+            <div style="font-size:18px;font-weight:800;color:${chlColour(L0)};font-family:var(--font-mono);">${L0.ndci}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(L0.chlorophyllClass)}</div>
+          </div>
+        </div>
+        <strong style="display:block;color:#fff;font-size:11px;margin-top:10px;">Recent clear images</strong>
+        <table style="width:100%;font-size:11px;margin-top:4px;border-collapse:collapse;">
+          ${r.trend.map(t => `<tr style="border-bottom:1px solid var(--border-subtle);"><td style="padding:3px 0;color:var(--text-muted);">${t.date}</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:${turbColour(t)};">${fnu(t)} FNU</td>
+            <td style="text-align:right;font-family:var(--font-mono);color:${chlColour(t)};">NDCI ${t.ndci}</td></tr>`).join('')}
+        </table>
+        <div style="margin-top:10px;padding:8px 10px;border:1px solid var(--border-subtle);border-radius:8px;font-size:11px;${ai ? '' : 'display:none;'}">
+          ${aiTag}
+          ${ai ? `<div style="color:#fff;margin-top:4px;">${escapeHtml(ai.summary)}</div>
+            <div style="margin-top:4px;color:var(--text-dim);">Seen in the image:</div>${list(ai.image_observations)}
+            <div style="margin-top:4px;color:var(--text-dim);">Possible causes:</div>${list(ai.likely_causes)}
+            <div style="margin-top:4px;color:var(--text-dim);">Next steps:</div>${list(ai.advice)}` : ''}
+        </div>
+        <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:8px 10px;font-size:11px;color:#fde68a;margin-top:10px;">
+          <b>Satellites see colour, not chemistry.</b> Not measured here: ${r.notMeasured.map(escapeHtml).join(', ')}. These need water samples.
+        </div>
+        <details style="margin-top:6px;font-size:11px;color:var(--text-muted);"><summary style="cursor:pointer;">Method</summary>${list(r.method)}</details>
+        <div style="margin-top:6px;font-size:10px;color:var(--text-dim);">${r.sources.map(escapeHtml).join(' · ')} · ${(r.tookMs / 1000).toFixed(0)} s</div>`;
+    }
+
+    // =========================================================================
+    // PICK A RIVER: hover highlights the whole river under the cursor, click scans it
+    // server: /api/v1/rivers/at (rivers.js mainStem) → /api/v1/dam/atlas { reachId }
+    // =========================================================================
+    let pickMode = false, pickLayer = null, pickCurrent = null, pickReq = 0, pickTimer = 0, pickLast = null;
+    const INDIA_BOX = [68.0, 6.5, 97.5, 37.5];
+
+    function setPickMode(on) {
+      pickMode = on;
+      document.getElementById('map-container').classList.toggle('picking-river', on);
+      const btn = document.getElementById('pick-river-btn');
+      if (btn) btn.innerHTML = on ? '✖ Cancel picking (Esc)' : '🖱️ Pick a river on the map';
+      document.getElementById('pick-river-hint').style.display = on ? 'block' : 'none';
+      if (!on) clearPickHighlight();
+    }
+
+    function clearPickHighlight() {
+      if (pickLayer) { map.removeLayer(pickLayer); pickLayer = null; }
+      pickCurrent = null;
+    }
+
+    async function lookupRiverAt(latlng) {
+      const id = ++pickReq;
+      const z = map.getZoom();
+      // ~14 px tolerance around the cursor, in km at this zoom and latitude
+      const metresPerPx = 156543.03 * Math.cos(latlng.lat * Math.PI / 180) / Math.pow(2, z);
+      const km = Math.max(0.3, Math.min(30, (14 * metresPerPx) / 1000));
+      const inIndia = latlng.lng >= INDIA_BOX[0] && latlng.lng <= INDIA_BOX[2] && latlng.lat >= INDIA_BOX[1] && latlng.lat <= INDIA_BOX[3];
+      const min = z >= 8 && inIndia ? 100 : 1000; // small Indian rivers once zoomed in
+      try {
+        const res = await fetch(`/api/v1/rivers/at?lat=${latlng.lat.toFixed(5)}&lon=${latlng.lng.toFixed(5)}&km=${km.toFixed(2)}&min=${min}`);
+        if (!res.ok || id !== pickReq || !pickMode) return;
+        const data = await res.json();
+        if (id !== pickReq || !pickMode) return;
+        if (!data.river) {
+          clearPickHighlight();
+          document.getElementById('pick-river-hint').textContent = 'Move the cursor over a river line (zoom in for smaller rivers).';
+          return;
+        }
+        if (pickCurrent?.key === data.river.key) { pickCurrent = data.river; return; } // same river: keep drawing
+        clearPickHighlight();
+        pickCurrent = data.river;
+        pickLayer = L.layerGroup().addTo(map);
+        L.polyline(data.path, { color: '#fde047', weight: 11, opacity: 0.25, interactive: false }).addTo(pickLayer);
+        L.polyline(data.path, { color: '#fde047', weight: 4, opacity: 0.95, interactive: false }).addTo(pickLayer);
+        document.getElementById('pick-river-hint').innerHTML =
+          `<b style="color:#fde047;">Highlighted river: ${data.river.lengthKm.toLocaleString()} km</b>, ${data.river.mouthDischargeCms.toLocaleString()} m³/s at its mouth.<br/>Click to find every dam site along it.`;
+      } catch {
+        // network hiccup while hovering: ignore, the next move retries
+      }
+    }
+
+    function onPickMove(e) {
+      if (!pickMode) return;
+      pickLast = e.latlng;
+      if (pickTimer) return; // at most ~8 lookups per second
+      pickTimer = setTimeout(() => { pickTimer = 0; if (pickLast) lookupRiverAt(pickLast); }, 120);
+    }
+
+    function onPickClick() {
+      if (!pickCurrent) {
+        document.getElementById('pick-river-hint').textContent = 'No river under the cursor. Move closer to a river line, or zoom in.';
+        return;
+      }
+      const river = pickCurrent;
+      setPickMode(false);
+      runRiverAtlas('reach', { reachId: river.reachId, name: `River (${river.lengthKm.toLocaleString()} km)` });
+    }
+
+    // =========================================================================
+    // RIVER DAM ATLAS — server: /api/v1/dam/atlas (dam.js atlas())
+    // Every feasible site along a whole river, marked with a dam icon.
+    // =========================================================================
+    // Unicode has no dam emoji: a small dam (concrete wall holding back water) drawn as SVG.
+    const DAM_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">' +
+      '<rect x="1" y="7" width="9" height="13" rx="1" fill="#0ea5e9"/><path d="M1 10q2-1.5 4 0t4 0" stroke="#e0f2fe" stroke-width="1.2" fill="none"/>' +
+      '<path d="M9 4h5l8 16H9z" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<path d="M11 8h3M11 12h5M11 16h7" stroke="#64748b" stroke-width="1"/></svg>';
+    function damIcon(size = 24, faded = false) {
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:${size}px;height:${size}px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));opacity:${faded ? 0.55 : 1}">${DAM_SVG.replace(/width="24" height="24"/, `width="${size}" height="${size}"`)}</div>`,
+        iconSize: [size, size], iconAnchor: [size / 2, size / 2],
+      });
+    }
+
+    async function runRiverAtlas(mode, picked) {
+      let body, title;
+      if (mode === 'reach') {
+        body = { reachId: picked.reachId, name: picked.name };
+        title = picked.name;
+      } else if (mode === 'selected') {
+        const r = WORLD_RIVERS_REGISTRY[activeRiverId];
+        body = { name: r.name, sketch: r.path };
+        title = r.name;
+      } else {
+        const lat = parseFloat(document.getElementById('target-lat').value);
+        const lon = parseFloat(document.getElementById('target-lon').value);
+        body = { lat, lon };
+        title = `river at ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+      }
+      const steps = [
+        `Tracing the whole ${title} from source to mouth (HydroRIVERS)…`,
+        'Cutting the river into ~30 km sections and pre-screening each one…',
+        'Analysing the most promising sections: river bed, head, flow, weir sites…',
+        'Checking topsoil (SoilGrids) and earthquake history (USGS) at each site…',
+        'Keeping every site that can coexist and grouping them into regions…',
+      ];
+      const { data, error } = await withAnalyser(`Dam atlas · ${title}`, steps, () =>
+        fetch('/api/v1/dam/atlas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }));
+      renderRiverAtlas(data, error);
+    }
+
+    function renderRiverAtlas(r, error) {
+      const panel = document.getElementById('dam-planner-panel');
+      const resultsDiv = document.getElementById('dam-plan-results');
+      panel.style.display = 'flex';
+      resultsDiv.style.display = 'block';
+      document.getElementById('dam-panel-title').textContent = 'River Dam Atlas';
+      if (damLayer) { map.removeLayer(damLayer); damLayer = null; }
+      damMarkers = [];
+      if (error) {
+        resultsDiv.innerHTML = `<div style="border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.08);border-radius:8px;padding:10px;font-size:12px;color:#fca5a5;">${escapeHtml(error)}</div>`;
+        return;
+      }
+      damLayer = L.layerGroup().addTo(map);
+      const riverLine = L.polyline(r.path, { color: '#22d3ee', weight: 3, opacity: 0.85 }).addTo(damLayer);
+      r.sites.forEach(d => {
+        L.polyline(d.route, { color: '#38bdf8', weight: 4, opacity: 0.9, interactive: false }).addTo(damLayer);
+        const m = L.marker(d.intake, { icon: damIcon(24), riseOnHover: true })
+          .bindTooltip(`<b>Site ${d.rank}</b> · ${d.mw} MW · head ${d.headM} m`, { direction: 'top', offset: [0, -10] })
+          .bindPopup(`<div style="font-size:12px;color:#0f172a;"><strong style="color:#0284c7;">Site ${d.rank}: ${d.mw} MW</strong> (score ${d.score})<br/>
+            km ${d.kmFromSource} from source · head ${d.headM} m over ${d.diversionKm} km · flow ${d.flowCms} m³/s<br/>
+            Weir crest ≈ ${d.weirCrestM} m · ${d.soil ? `soil ${d.soil.textureClass}` : 'soil n/a'} · ${d.quakesM5Within50km === null ? 'quakes n/a' : `${d.quakesM5Within50km} M5+ quakes ≤50 km`}<br/>
+            <span style="font-family:monospace">${d.intake[0].toFixed(5)}, ${d.intake[1].toFixed(5)}</span></div>`)
+          .addTo(damLayer);
+        damMarkers.push(m);
+      });
+      map.fitBounds(riverLine.getBounds(), { padding: [30, 30] });
+
+      const f = r.feasible;
+      const rows = r.sites.map(d => `
+        <div class="atlas-row" onclick="map.flyTo([${d.intake[0]}, ${d.intake[1]}], 12); damMarkers[${d.rank - 1}].openPopup();"
+             style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--border-subtle);">
+          <span style="width:20px;height:20px;flex:none;">${DAM_SVG.replace(/width="24" height="24"/, 'width="20" height="20"')}</span>
+          <span style="flex:1;color:var(--text-muted);"><b style="color:#fff;">Site ${d.rank}</b> · km ${d.kmFromSource} · head ${d.headM} m · crest ${d.weirCrestM} m</span>
+          <span style="font-family:var(--font-mono);color:#38bdf8;">${d.mw} MW</span>
+        </div>`).join('');
+      const listHtml = items => `<ul style="margin:4px 0 0;padding-left:16px;font-size:11px;color:var(--text-muted);">${items.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+      resultsDiv.innerHTML = `
+        <div style="background:${f.sites ? 'rgba(16,185,129,.15)' : 'rgba(251,191,36,.1)'};border:1px solid ${f.sites ? 'rgba(16,185,129,.4)' : 'rgba(251,191,36,.4)'};border-radius:8px;padding:10px;">
+          <div style="font-size:11px;font-weight:700;color:${f.sites ? '#34d399' : '#fbbf24'};text-transform:uppercase;">${escapeHtml(r.river.name)} · ${r.river.lengthKm.toLocaleString()} km</div>
+          <div style="font-size:14px;font-weight:800;color:#fff;margin-top:2px;">${f.complete ? '' : 'At least '}${f.sites} feasible dam site${f.sites === 1 ? '' : 's'} in ${f.regions} region${f.regions === 1 ? '' : 's'}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+            Together ≈ <b>${f.totalMw.toLocaleString()} MW</b> potential · ${r.sections.analysed} of ${r.sections.promising} promising sections analysed in detail (${r.sections.total} sections in total) · ${(r.tookMs / 1000).toFixed(0)} s
+            ${f.complete ? '' : `<br/>${f.unverifiedSections} more promising section${f.unverifiedSections === 1 ? '' : 's'} not analysed: the real total is higher.`}
+          </div>
+        </div>
+        <div style="margin-top:8px;max-height:46vh;overflow:auto;">${rows || '<div style="font-size:12px;color:var(--text-muted);padding:8px;">No section of this river passed all checks (enough drop, a narrow enough valley, plausible elevation data).</div>'}</div>
+        <details style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+          <summary style="cursor:pointer;color:#fbbf24;">⚠ Not evaluated (${r.notEvaluated.length})</summary>${listHtml(r.notEvaluated)}
+        </details>
+        <details style="margin-top:6px;font-size:11px;color:var(--text-muted);">
+          <summary style="cursor:pointer;">Method &amp; assumptions</summary>${listHtml(r.assumptions)}
+        </details>
+        <div style="margin-top:6px;font-size:10px;color:var(--text-dim);">${(r.sources || []).map(escapeHtml).join(' · ')}</div>`;
+    }
+
+    // =========================================================================
+    // CITY POWER PLANNER — server: /api/v1/dam/plan (dam.js plan())
+    // A city needs X MW: scan rivers within the radius, analyse the best stretches and
+    // rank weir sites on power, gorge, distance to the city, soil and earthquake history.
+    // =========================================================================
+    async function findPlanCity() {
+      const q = document.getElementById('plan-city').value.trim();
+      const found = document.getElementById('plan-city-found');
+      if (!q) return false;
+      found.textContent = 'Searching…';
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`);
+        const [hit] = await res.json();
+        if (!hit) { found.textContent = `No place found for "${q}".`; return false; }
+        const lat = +hit.lat, lon = +hit.lon;
+        document.getElementById('target-lat').value = lat.toFixed(4);
+        document.getElementById('target-lon').value = lon.toFixed(4);
+        document.getElementById('target-location-name').value = q;
+        found.textContent = `📍 ${hit.display_name.split(',').slice(0, 3).join(',')} (${lat.toFixed(2)}, ${lon.toFixed(2)})`;
+        if (map) map.flyTo([lat, lon], 7, { duration: 1 });
+        return true;
+      } catch {
+        found.textContent = 'City search is unavailable. Click the map to pick the place instead.';
+        return false;
+      }
+    }
+
+    async function runCityPlan() {
+      const nameNow = document.getElementById('plan-city').value.trim();
+      // search first if the typed city is not the one already found
+      if (nameNow && nameNow !== document.getElementById('target-location-name').value) {
+        if (!(await findPlanCity())) return;
+      }
+      const city = document.getElementById('target-location-name').value;
+      const lat = parseFloat(document.getElementById('target-lat').value);
+      const lon = parseFloat(document.getElementById('target-lon').value);
+      const targetMw = parseInt(document.getElementById('mw-slider').value, 10);
+      const radiusKm = parseInt(document.getElementById('plan-radius').value, 10);
+      const rankBy = document.querySelector('input[name="plan-rank"]:checked')?.value || 'best';
+
+      const steps = [
+        `Scanning every major river within ${radiusKm} km of ${city} (HydroRIVERS)…`,
+        'Pre-screening river drops for hydropower potential (elevation model)…',
+        'Analysing the best stretches: river bed, head, flow and weir sites…',
+        'Checking topsoil (SoilGrids) and earthquake history (USGS) at each site…',
+        `Scoring sites and choosing the best mix to supply ${targetMw} MW…`,
+      ];
+      const result = await withAnalyser(`${targetMw} MW for ${city}`, steps, () =>
+        fetch('/api/v1/dam/plan', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ city, lat, lon, targetMw, radiusKm, rankBy }),
+        }));
+      renderCityPlan(result.data, result.error);
+    }
+
+    /** Runs a request behind the analysis overlay, advancing the step list while waiting. */
+    async function withAnalyser(title, labels, request) {
+      const overlay = document.getElementById('cinematic-analyser-overlay');
+      const workspace = document.getElementById('main-workspace');
+      document.getElementById('overlay-mw-target').textContent = title;
+      const ids = ['step-1', 'step-2', 'step-3', 'step-4', 'step-5'];
+      ids.forEach((id, k) => { document.getElementById(id).querySelector('span:last-child').textContent = `[Stage ${k + 1}/5] ${labels[k]}`; });
+      const setStage = idx => {
+        ids.forEach((id, k) => {
+          const el = document.getElementById(id);
+          el.classList.toggle('active', k === idx);
+          el.classList.toggle('done', k < idx);
+          el.querySelector('span:first-child').textContent = k < idx ? '✅' : k === idx ? '⏳' : '⚪';
+        });
+        document.getElementById('analyser-status-text').textContent = labels[idx].replace(/…$/, '').toUpperCase();
+        document.getElementById('analyser-progress-pct').textContent = Math.round((idx + 1) * 20) + '%';
+      };
+      workspace.classList.add('analyzing-blur');
+      overlay.style.display = 'flex';
+      let stage = 0;
+      setStage(0);
+      const ticker = setInterval(() => { if (stage < ids.length - 1) setStage(++stage); }, 4000);
+      let data, error;
+      try {
+        const res = await request();
+        data = await res.json().catch(() => ({ error: `Server error (HTTP ${res.status}).` }));
+        if (!res.ok) error = data.error || `HTTP ${res.status}`;
+      } catch {
+        error = 'Could not reach the server. Is it running?';
+      }
+      clearInterval(ticker);
+      setStage(ids.length - 1);
+      workspace.classList.remove('analyzing-blur');
+      overlay.style.display = 'none';
+      return { data, error };
+    }
+
+    function renderCityPlan(r, error) {
+      document.getElementById('dam-panel-title').textContent = 'City Power Plan';
+      const panel = document.getElementById('dam-planner-panel');
+      const resultsDiv = document.getElementById('dam-plan-results');
+      panel.style.display = 'flex';
+      resultsDiv.style.display = 'block';
+      if (damLayer) { map.removeLayer(damLayer); damLayer = null; }
+      damMarkers = [];
+      if (error) {
+        resultsDiv.innerHTML = `<div style="border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.08);border-radius:8px;padding:10px;font-size:12px;color:#fca5a5;">${escapeHtml(error)}</div>`;
+        return;
+      }
+      damLayer = L.layerGroup().addTo(map);
+      const home = [r.city.lat, r.city.lon];
+      L.circle(home, { radius: r.radiusKm * 1000, color: '#38bdf8', weight: 1, dashArray: '4 6', fill: false, interactive: false }).addTo(damLayer);
+      L.marker(home, {
+        icon: L.divIcon({ className: '', html: '<div style="font-size:22px;line-height:22px;filter:drop-shadow(0 1px 3px #000)">🏙️</div>', iconSize: [22, 22], iconAnchor: [11, 11] }),
+      }).bindTooltip(`${escapeHtml(r.city.name)} · needs ${r.targetMw} MW`, { permanent: true, direction: 'top', offset: [0, -12] }).addTo(damLayer);
+
+      const listHtml = items => `<ul style="margin:4px 0 0;padding-left:16px;font-size:11px;color:var(--text-muted);">${items.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+      const footer = `
+        <details style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+          <summary style="cursor:pointer;color:#fbbf24;">⚠ Not evaluated in this screening (${r.notEvaluated.length})</summary>${listHtml(r.notEvaluated)}
+        </details>
+        <details style="margin-top:6px;font-size:11px;color:var(--text-muted);">
+          <summary style="cursor:pointer;">Method &amp; assumptions</summary>${listHtml(r.assumptions)}
+        </details>
+        <div style="margin-top:6px;font-size:10px;color:var(--text-dim);">${(r.sources || []).map(escapeHtml).join(' · ')}</div>`;
+
+      if (!r.ok) {
+        map.fitBounds(L.circle(home, { radius: r.radiusKm * 1000 }).addTo(damLayer).getBounds());
+        resultsDiv.innerHTML = `<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);border-radius:8px;padding:10px;font-size:12px;color:#fde68a;">${escapeHtml(r.reason)}</div>${footer}`;
+        return;
+      }
+
+      const bounds = L.latLngBounds([home]);
+      const chosenKeys = new Set(r.sites.map(d => d.intake.join(',')));
+      (r.feasible?.points || []).filter(p => !chosenKeys.has(p.intake.join(','))).forEach(p => {
+        L.marker(p.intake, { icon: damIcon(18, true) })
+          .bindTooltip(`Also feasible · ${p.mw} MW (not needed for this demand)`, { direction: 'top', offset: [0, -8] }).addTo(damLayer);
+      });
+      r.sites.forEach(d => {
+        L.polyline([d.powerhouse, home], { color: '#fbbf24', weight: 1.5, opacity: 0.7, dashArray: '6 6', interactive: false }).addTo(damLayer);
+        L.polyline(d.route, { color: '#38bdf8', weight: 5, opacity: 0.9 }).addTo(damLayer);
+        L.polyline(d.weirAxis, { color: '#f43f5e', weight: 6 }).bindTooltip(`Site ${d.rank} weir · crest ≈ ${d.weirCrestM} m`).addTo(damLayer);
+        const m = L.marker(d.intake, { icon: damIcon(28), zIndexOffset: 1000 })
+          .bindTooltip(`<b>Site ${d.rank}</b> · ${d.proposedMw} MW`, { permanent: true, direction: 'right', offset: [12, 0] }).addTo(damLayer);
+        damMarkers.push(m);
+        bounds.extend(d.intake);
+      });
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 9 });
+
+      const LABELS = { power: 'Power', gorge: 'Narrow gorge', distance: 'Near city', foundation: 'Soil / foundation', seismic: 'Few earthquakes' };
+      const bar = (k, v) => `
+        <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);margin-top:2px;">
+          <span style="width:92px;">${LABELS[k]} <span style="opacity:.6">${Math.round(r.weights[k] * 100)}%</span></span>
+          <span style="flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;">
+            <span style="display:block;height:100%;width:${v === null ? 50 : Math.round(v * 100)}%;background:${v === null ? '#64748b' : '#38bdf8'};"></span>
+          </span>
+          <span style="width:28px;text-align:right;font-family:var(--font-mono);">${v === null ? 'n/a' : Math.round(v * 100)}</span>
+        </div>`;
+      const cards = r.sites.map(d => `
+        <div class="dam-site-card" style="background: var(--bg-deep); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px; margin-top: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #38bdf8; font-size: 12px;">Site ${d.rank} · score ${d.score}/100</strong>
+            <span style="font-family: var(--font-mono); font-size: 11px; background: rgba(56, 189, 248, 0.2); padding: 2px 6px; border-radius: 4px; color: #ffffff;">${d.proposedMw} MW</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+            ${d.proposedMw < d.mw ? `Potential <b>${d.mw} MW</b>, ${d.proposedMw} MW needed · ` : ''}Head <b>${d.headM} m</b> over ${d.diversionKm} km · Flow <b>${d.flowCms} m³/s</b> · Weir crest <b>≈ ${d.weirCrestM} m</b>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+            <b>${d.distanceToCityKm} km</b> to ${escapeHtml(r.city.name)} · ${d.soil ? `Soil: <b>${escapeHtml(d.soil.textureClass)}</b> (stones ${d.soil.coarseFragmentsPct}%, clay ${d.soil.clayPct}%)` : 'Soil: n/a'} · ${d.quakesM5Within50km === null ? 'quakes n/a' : `<b>${d.quakesM5Within50km}</b> M5+ quakes ≤50 km since 1970`}
+          </div>
+          <div style="margin-top: 6px;">${Object.keys(r.weights).map(k => bar(k, d.criteria[k])).join('')}</div>
+          <div style="font-size: 10px; color: var(--text-dim); margin-top: 4px; font-family: var(--font-mono);">Weir ${d.intake[0].toFixed(5)}, ${d.intake[1].toFixed(5)}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button class="btn" style="flex:1;justify-content:center;font-size:10px;padding:4px;" onclick="showSatellite(); map.flyTo([${d.intake[0]}, ${d.intake[1]}], 15)">📍 Inspect on satellite</button>
+            <button class="btn" style="flex:1;justify-content:center;font-size:10px;padding:4px;" onclick="reviewSiteWithGemma(this, ${d.intake[0]}, ${d.intake[1]}, ${d.rank})">✦ Gemma 4 site review</button>
+          </div>
+          <div class="gemma-review" style="font-size:11px;margin-top:6px;"></div>
+        </div>`).join('');
+
+      resultsDiv.innerHTML = `
+        <div style="background: ${r.meetsTarget ? 'rgba(16, 185, 129, 0.15)' : 'rgba(251,191,36,.1)'}; border: 1px solid ${r.meetsTarget ? 'rgba(16, 185, 129, 0.4)' : 'rgba(251,191,36,.4)'}; border-radius: 8px; padding: 10px;">
+          <div style="font-size: 11px; font-weight: 700; color: ${r.meetsTarget ? '#34d399' : '#fbbf24'}; text-transform: uppercase;">Power plan · ${escapeHtml(r.city.name)} · ${r.rankBy === 'nearest' ? 'nearest sites first' : 'best sites first'}</div>
+          <div style="font-size: 14px; font-weight: 800; color: #ffffff; margin-top: 2px;">${r.sites.length} site${r.sites.length > 1 ? 's' : ''} supply ${r.achievedMw} of ${r.targetMw} MW</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+            ≈ <b>${r.annualGWh.toLocaleString()} GWh/yr</b> at 50 % capacity factor · ${r.reachesScanned.toLocaleString()} river reaches scanned, ${r.stretchesAnalysed} stretches analysed, ${r.candidatesScored} sites scored in ${(r.tookMs / 1000).toFixed(0)} s
+            ${r.meetsTarget ? '' : `<br/>Only ${r.potentialMw} MW of suitable sites within ${r.radiusKm} km: try a larger radius.`}
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:8px 10px;border:1px solid var(--border-subtle);border-radius:8px;font-size:11px;color:var(--text-muted);">
+          <b style="color:#fff;">${r.feasible.complete ? '' : 'At least '}${r.feasible.sites} feasible dam sites in ${r.feasible.regions} region${r.feasible.regions === 1 ? '' : 's'}</b>
+          within ${r.radiusKm} km (≈ ${r.feasible.totalMw.toLocaleString()} MW together; faded dam icons on the map).
+          ${r.feasible.complete ? '' : `Found in the ${r.stretchesAnalysed} most promising stretches; <b>${r.feasible.unverifiedAreas}</b> more promising area${r.feasible.unverifiedAreas === 1 ? '' : 's'} were not analysed in detail.`}
+        </div>
+        ${cards}
+        ${footer}`;
+    }
+
+    // =========================================================================
+    // HYDROPOWER SITES — map layer shared by the planner and the river atlas (server: dam.js)
+    // Sites are computed along the real river (HydroRIVERS) from DEM heads and modelled flow.
+    // =========================================================================
+    let damLayer = null;
+
+    function escapeHtml(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // Gemma 4 reviews a candidate site: satellite image + terrain/flood/rain data (Hazard Lens API)
+    async function reviewSiteWithGemma(btn, lat, lon, rank) {
+      const box = btn.closest('.dam-site-card').querySelector('.gemma-review');
+      btn.disabled = true;
+      box.innerHTML = '<span style="color:var(--text-muted);">✦ Gemma 4 is looking at the satellite image and data (up to ~90 s)…</span>';
+      try {
+        const res = await fetch('/api/v1/hazard', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat, lon, name: `Candidate hydropower intake site ${rank}` }),
+        });
+        const r = await res.json();
+        if (!res.ok) throw new Error(r.error || `HTTP ${res.status}`);
+        const tag = r.readingSource === 'gemma'
+          ? `<span style="color:#38bdf8;">✦ Gemma 4 (${escapeHtml(r.model)})</span>`
+          : r.readingSource === 'backup'
+            ? '<span style="color:#94a3b8;">✦ AI site review</span>'
+            : '<span style="color:#94a3b8;">Site review from the data</span>';
+        const a = r.reading;
+        box.innerHTML = `${tag}<div style="color:#fff;margin-top:3px;">${escapeHtml(a.headline)}</div>
+          <ul style="margin:4px 0 0;padding-left:16px;color:var(--text-muted);">${a.hazards.map(h => `<li><b>${escapeHtml(h.type.replace(/_/g, ' '))}: ${escapeHtml(h.level.replace('_', ' '))}</b> — ${escapeHtml(h.evidence_image)}</li>`).join('')}</ul>`;
+      } catch (err) {
+        box.innerHTML = `<span style="color:#fca5a5;">Review failed: ${escapeHtml(err.message)}</span>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // =========================================================================
+    // AQUA (GEMMA 4) TERMINAL CHAT
+    // =========================================================================
+    function toggleAqua(show) {
+      const drawer = document.getElementById('aqua-drawer');
+      drawer.style.display = show ? 'flex' : 'none';
+      if (show) {
+        document.getElementById('aqua-input').focus();
+      }
+    }
+
+    function sendAquaPrompt(text) {
+      document.getElementById('aqua-input').value = text;
+      submitAquaMessage();
+    }
+
+    async function submitAquaMessage() {
+      const input = document.getElementById('aqua-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage(text, 'user');
+      input.value = '';
+
+      // Loading bubble
+      const loadingId = 'loading-' + Date.now();
+      appendChatMessage('Gemma 4 is thinking...', 'aqua', loadingId);
+
+      try {
+        const res = await fetch('/api/v1/aqua/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: text,
+            context: {
+              riverName: WORLD_RIVERS_REGISTRY[activeRiverId].name,
+              coordinates: WORLD_RIVERS_REGISTRY[activeRiverId].centerCoords
+            }
+          })
+        });
+
+        const loadingElem = document.getElementById(loadingId);
+        if (loadingElem) loadingElem.remove();
+
+        if (res.ok) {
+          const data = await res.json();
+          appendChatMessage(formatMarkdown(data.text + (data.model && data.gemma ? `
+
+*Answered by ${data.model}*` : '')), 'aqua');
+          if (data.targetCoords && map) {
+            map.flyTo(data.targetCoords, 9);
+          }
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (res.status === 429) return appendChatMessage(formatMarkdown(err.error || 'Too many questions. Please wait a few minutes.'), 'aqua');
+          appendFallbackAquaAnswer(text);
+        }
+      } catch (err) {
+        const loadingElem = document.getElementById(loadingId);
+        if (loadingElem) loadingElem.remove();
+        appendFallbackAquaAnswer(text);
+      }
+    }
+
+    // Shown when the AI did not answer: says so, and gives general notes only (nothing about this river)
+    function appendFallbackAquaAnswer(query) {
+      appendChatMessage(formatMarkdown('*Gemma 4 could not answer right now (the free AI service may be busy). Please try again in a minute. General notes, not specific to this river:*'), 'aqua');
+      const q = query.toLowerCase();
+      let answer = '';
+
+      if (q.includes('dam') || q.includes('mw') || q.includes('power')) {
+        answer = `### ⚡ Aqua Hydropower Analysis
+To fulfill electrical demand, River Eyes applies the physics formula:
+$$P = \\frac{\\eta \\cdot \\rho \\cdot g \\cdot Q \\cdot H}{10^6}$$
+* **Turbine efficiency**: $\\eta = 0.90$
+* **Gravity**: $g = 9.81\\text{ m/s}^2$
+* For high power outputs (> 400 MW), a multi-dam cascade is allocated to minimize reservoir submergence while maximizing natural gorge drop.`;
+      } else if (q.includes('soil') || q.includes('bearing')) {
+        answer = `### 🧪 Geotechnical Soil Assessment
+* **Bearing Capacity ($q_u$)**: Evaluated from ISRIC SoilGrids. Rock flanks (> 400 kPa) support concrete gravity dams.
+* **Bedrock Depth**: Deep alluvium (> 20m) requires positive cut-off diaphragm walls or earth-fill rockfill embankments.`;
+      } else {
+        answer = `### 🌊 Aqua
+River Eyes can help with dam siting (power in MW), soil and foundations, floods and water quality. For live numbers, use the Water Quality and Site Conditions panels.`;
+      }
+
+      appendChatMessage(formatMarkdown(answer), 'aqua');
+    }
+
+    function appendChatMessage(html, sender, customId) {
+      const container = document.getElementById('aqua-messages');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${sender}`;
+      if (customId) bubble.id = customId;
+      bubble.innerHTML = html;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function formatMarkdown(text) {
+      if (!text) return '';
+      return plainMath(text)
+        // escape first: answers come from the model and must never become live HTML
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '<br/><br/>')
+        .replace(/\n/g, '<br/>');
+    }
+
+    // The chat has no LaTeX renderer: turn the model's $…$ formulas into plain symbols
+    function plainMath(text) {
+      const SYMBOLS = { cdot: '·', times: '×', eta: 'η', rho: 'ρ', approx: '≈', Delta: 'Δ', mu: 'μ', pi: 'π', le: '≤', ge: '≥', leq: '≤', geq: '≥', sigma: 'σ', alpha: 'α', beta: 'β', gamma: 'γ', theta: 'θ', lambda: 'λ' };
+      return text.replace(/\$\$?([^$]+?)\$\$?/g, (whole, m) => !/[\\^_=]/.test(m) && !/^\s*[A-Za-z]\w{0,3}\s*$/.test(m) ? whole : m // "$5 … $10" is money; "$Q$" is maths
+        .replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '($1) / ($2)')
+        .replace(/\\(?:text|mathrm|mathbf)\{([^{}]*)\}/g, '$1')
+        .replace(/\\([A-Za-z]+)/g, (s, name) => SYMBOLS[name] ?? name)
+        .replace(/\^\{([^{}]*)\}/g, '^$1')
+        .replace(/[{}]/g, '')
+        .replace(/\s+/g, ' ').trim());
+    }
+
+    // Initialize application on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      switchRiver('ganga');
+      document.getElementById('plan-city-go').addEventListener('click', findPlanCity);
+      document.getElementById('plan-city').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); findPlanCity(); } });
+      // Demo link: river-eyes/index.html#plan runs the city planner with the default city
+      if (location.hash === '#plan') setTimeout(runCityPlan, 1500);
+      // Demo link: #atlas scans the selected river (add &river=yamuna etc. to pick another)
+      if (location.hash.startsWith('#atlas')) {
+        const pick = new URLSearchParams(location.hash.slice(7)).get('river');
+        if (pick && WORLD_RIVERS_REGISTRY[pick]) switchRiver(pick);
+        setTimeout(() => runRiverAtlas('selected'), 1500);
+      }
+    });
+  </script>
 </body>
 </html>
