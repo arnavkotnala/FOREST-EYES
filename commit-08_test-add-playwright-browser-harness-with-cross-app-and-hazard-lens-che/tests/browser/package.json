@@ -1,0 +1,8 @@
+{
+  "name": "earth-eyes-browser-tests",
+  "private": true,
+  "description": "Browser click-through and AI-guard tests for Earth Eyes (not used by the deployed app)",
+  "dependencies": {
+    "playwright-core": "1.48.2"
+  }
+}
