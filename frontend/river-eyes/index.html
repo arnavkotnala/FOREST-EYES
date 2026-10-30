@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>River Eyes — Global Hydrological Intelligence & Dam Siting Platform</title>
+  <meta name="description" content="Global river monitoring, high-precision geospatial vector tracking, Gemma 4-powered Aqua assistant, and geotechnical energy-to-dam cascade siting." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>" />
+
+  <!-- Google Fonts: Inter, Outfit, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* =========================================================================
+       RIVER EYES v2.0 — HIGH-TECH DARK GEOSPATIAL DESIGN SYSTEM
+       ========================================================================= */
+    :root {
+      --bg-deep: #080c14;
+      --bg-surface: #0f1523;
+      --bg-elevated: #161f33;
+      --bg-card: #121929;
+      --border-subtle: #1e293b;
+      --border-medium: #2a374f;
+      --border-highlight: #38bdf8;
+
+      --blue-primary: #2563eb;
+      --blue-light: #38bdf8;
+      --cyan-glow: #06b6d4;
+      --teal-accent: #14b8a6;
+
+      --green-pristine: #10b981;
+      --green-light: #34d399;
+      --amber-warning: #f59e0b;
+      --amber-light: #fbbf24;
+      --red-danger: #ef4444;
+      --red-light: #f87171;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-heading: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--blue-light); }
+
+    /* Header */
+    header {
+      background: rgba(15, 21, 35, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 1000;
+    }
+    .header-center-spacer {
+      flex: 1;
+      min-width: 480px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .brand-logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      background: linear-gradient(to right, #ffffff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-subtitle {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .live-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+    }
+
+    /* Select Dropdowns */
+    .select-dropdown {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-medium);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .select-dropdown:hover, .select-dropdown:focus {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background: #1f2b45;
+      border-color: var(--border-highlight);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+    }
+    .btn-aqua {
+      background: linear-gradient(135deg, #0891b2, #0284c7);
+      border-color: rgba(6, 182, 212, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.35);
+    }
+    .btn-aqua:hover {
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* App Container */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Navigation Sidebar — Glassmorphic Control Hub (Forest Eyes style) */
+    .sidebar-nav {
+      width: 320px;
+      background: rgba(10, 22, 40, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 900;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, 0.25) transparent;
+      box-shadow: 4px 0 32px rgba(0, 0, 0, 0.4);
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.2); border-radius: 4px; }
+
+    .panel-section {
+      padding: 16px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .panel-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+    .input-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+    }
+    .panel-input {
+      width: 100%;
+      background: #090e18;
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: var(--font-body);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .panel-input:focus {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 10px 0;
+      color: var(--text-dim);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .divider-text::before, .divider-text::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .divider-text span {
+      padding: 0 8px;
+    }
+
+    .nav-header {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      padding: 4px 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-weight: 500;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+    }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.25), rgba(56, 189, 248, 0.05));
+      color: #ffffff;
+      font-weight: 600;
+      border-left: 3px solid var(--blue-light);
+    }
+    .nav-badge-pill {
+      margin-left: auto;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--blue-light);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Telemetry Grid (2-columns in Left Panel) */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .hud-card {
+      background: rgba(22, 31, 51, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .hud-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(22, 31, 51, 0.85);
+    }
+    .hud-card-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .hud-card-val {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #ffffff;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-run-analysis {
+      width: 100%;
+      justify-content: center;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-run-analysis:hover {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Aqua Floating Pill (Mirrors Treeko in Forest Eyes) */
+    .aqua-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(37, 99, 235, 0.08));
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      outline: none;
+    }
+    .aqua-pill:hover {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(37, 99, 235, 0.16));
+      border-color: rgba(56, 189, 248, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+    }
+    .aqua-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+    }
+    .aqua-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .aqua-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .aqua-desc {
+      font-size: 10px;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .aqua-sparkle {
+      margin-left: auto;
+      font-size: 14px;
+    }
+
+    /* Workspace */
+    .main-workspace {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Workspace blur transition when analyzing */
+    .main-workspace.analyzing-blur {
+      filter: blur(12px) brightness(0.65);
+      pointer-events: none;
+      transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Map and Workspace Content */
+    .content-area {
+      flex: 1;
+      position: relative;
+      display: flex;
+    }
+    #map-container {
+      width: 100%;
+      height: 100%;
+      background: #060911;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    /* Dynamic Side Panels / Overlays */
+    .view-panel {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 440px;
+      max-height: calc(100% - 28px);
+      background: rgba(15, 21, 35, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      z-index: 600;
+      overflow: hidden;
+      animation: fadeIn 0.25s ease;
+    }
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(22, 31, 51, 0.6);
+    }
+    .panel-title {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* =========================================================================
+       CINEMATIC "ANALYSING" FULLSCREEN OVERLAY
+       ========================================================================= */
+    #cinematic-analyser-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 12, 20, 0.88);
+      backdrop-filter: blur(18px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease;
+    }
+    .analyser-box {
+      width: 580px;
+      background: rgba(15, 21, 35, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 0 50px rgba(56, 189, 248, 0.25), 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    .analyser-box::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #10b981, #0284c7);
+      background-size: 200% 100%;
+      animation: gradientFlow 2s linear infinite;
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+    .analyser-radar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px dashed rgba(56, 189, 248, 0.6);
+      margin: 0 auto 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: spinRadar 4s linear infinite;
+    }
+    .analyser-radar-core {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #38bdf8 0%, rgba(2, 132, 199, 0.2) 70%);
+      box-shadow: 0 0 20px #38bdf8;
+    }
+    @keyframes spinRadar {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .analyser-step-list {
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 16px 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      max-height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .analyser-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+      transition: all 0.3s ease;
+    }
+    .analyser-step.active {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .analyser-step.done {
+      color: #10b981;
+    }
+
+    /* Aqua Drawer */
+    #aqua-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 440px;
+      background: rgba(12, 17, 28, 0.96);
+      backdrop-filter: blur(18px);
+      border-left: 1px solid var(--border-medium);
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+    }
+    .drawer-header {
+      padding: 14px 18px;
+      background: rgba(22, 31, 51, 0.8);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-bubble {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.55;
+      max-width: 90%;
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: #1e3a8a;
+      border: 1px solid #2563eb;
+      color: #ffffff;
+    }
+    .chat-bubble.aqua {
+      align-self: flex-start;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-medium);
+      color: var(--text-main);
+    }
+    .chat-bubble.aqua h3 {
+      font-family: var(--font-heading);
+      color: #38bdf8;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .quick-pill-strip {
+      display: flex;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+    }
+    .quick-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-medium);
+      color: var(--blue-light);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .quick-pill:hover {
+      background: #1e293b;
+      border-color: var(--blue-light);
+    }
+    .drawer-input-box {
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 8px;
+    }
+    .drawer-input {
+      flex: 1;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-size: 12px;
+      outline: none;
+    }
+    .drawer-input:focus {
+      border-color: var(--blue-light);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  
+    /* Map layer panel (basemap + river categories) in the app's dark style */
+    .leaflet-control-layers {
+      background: rgba(10, 22, 40, 0.92) !important; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.10) !important;
+      border-radius: 10px !important; box-shadow: 0 6px 18px rgba(0,0,0,.4) !important; backdrop-filter: blur(10px);
+      font: 500 12px 'Inter', sans-serif; padding: 8px 10px 8px 6px !important;
+    }
+    .leaflet-control-layers label { margin: 3px 0; cursor: pointer; }
+    .leaflet-control-layers-separator { border-top-color: rgba(255,255,255,0.12) !important; margin: 6px 0 !important; }
+    .leaflet-control-layers-overlays::before {
+      content: 'RIVERS'; display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #64748b; margin: 0 0 2px 4px;
+    }
+    .leaflet-control-layers input { accent-color: #38bdf8; }
+    .atlas-row:hover { background: rgba(56, 189, 248, 0.08); }
+    #map-container.picking-river, #map-container.picking-river .leaflet-interactive { cursor: crosshair !important; }
+    .rank-choice { display: flex; gap: 6px; }
+    .rank-choice label { flex: 1; display: flex; align-items: center; gap: 6px; padding: 7px 8px; border: 1px solid var(--border-subtle); border-radius: 6px; font-size: 11px; color: var(--text-muted); cursor: pointer; }
+    .rank-choice label:has(input:checked) { border-color: rgba(56,189,248,.6); color: #fff; background: rgba(56,189,248,.08); }
+    .rank-choice input { accent-color: #38bdf8; margin: 0; }
+</style>
+</head>
+<body>
+
+  <!-- Top Navigation Header (Open Center for Zero Master Toggle Overlap) -->
+  <header>
+    <div class="brand-section" onclick="switchRiver('ganga')">
+      <div class="brand-logo-badge">🌊</div>
+      <div>
+        <div class="brand-title">River Eyes <span style="font-size: 11px; font-weight: 500; color: #38bdf8;">v2.0</span></div>
+        <div class="brand-subtitle">
+          <span class="live-pulse"></span>
+          <span>GLOBAL HYDROLOGY & DAM SITING INTELLIGENCE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Spacer: Guaranteed Open Corridor for Master Floating Toggle Bar -->
+    <div class="header-center-spacer"></div>
+
+    <!-- Right Quick Controls -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 5px 12px; border-radius: 20px; font-size: 11px; color: #34d399; font-weight: 500;">
+        <span class="live-pulse"></span>
+        <span>Monitoring Active</span>
+      </div>
+
+      <button class="btn btn-primary" onclick="openDamPlannerTab()">
+        <span>⚡</span>
+        <span>Plan Dam Siting (MW)</span>
+      </button>
+
+      <button class="btn btn-aqua" onclick="toggleAqua(true)">
+        <span>✨</span>
+        <span>Aqua (Gemma 4)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Main Workspace Container -->
+  <div class="app-container">
+    <!-- Left Glassmorphic Control Hub (Mirrors Forest Eyes Structure) -->
+    <nav class="sidebar-nav">
+      <!-- SECTION 1: Location & Basin Input -->
+      <div class="panel-section">
+        <h2 class="panel-section-title">📍 River Basin & Location Input</h2>
+        <div class="input-group">
+          <label class="input-label" for="world-river-select">Select Active Basin</label>
+          <select id="world-river-select" class="select-dropdown" onchange="switchRiver(this.value)" style="width: 100%;">
+            <optgroup label="Asia">
+              <option value="ganga" selected>Ganga (Ganges) — Himalayan Basin</option>
+              <option value="yamuna">Yamuna River — Delhi & Alluvial Basin</option>
+              <option value="brahmaputra">Brahmaputra — Great Bend & Assam Valley</option>
+              <option value="indus">Indus River — Karakoram Canyon Reach</option>
+              <option value="yangtze">Yangtze River — Three Gorges Corridor</option>
+              <option value="mekong">Mekong River — Lancang & Indochina</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="amazon">Amazon River — Equatorial Mega-Basin</option>
+              <option value="mississippi">Mississippi River — Great Valley Basin</option>
+            </optgroup>
+            <optgroup label="Africa">
+              <option value="nile">Nile River — Blue & White Confluence</option>
+              <option value="congo">Congo River — Inga Rapids Craton</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="danube">Danube River — Iron Gate Gorge</option>
+              <option value="rhine">Rhine River — Alpine to Graben Delta</option>
+            </optgroup>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- SECTION 2: City Power Planner — a city needs X MW: where should the dams go? -->
+      <div class="panel-section" id="city-planner">
+        <h2 class="panel-section-title">⚡ City Power Planner</h2>
+        <div class="input-group">
+          <label class="input-label" for="plan-city">City that needs electricity</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="plan-city" class="panel-input" style="flex: 1;" value="Dehradun" placeholder="e.g. Dehradun, Shimla, Guwahati" />
+            <button class="btn" id="plan-city-go" type="button" style="padding: 0 12px;" title="Find city">🔍</button>
+          </div>
+          <div id="plan-city-found" style="font-size: 10px; color: var(--text-dim); margin-top: 4px;">📍 Dehradun, Uttarakhand, India (30.32, 78.03)</div>
+          <input type="hidden" id="target-lat" value="30.3165" />
+          <input type="hidden" id="target-lon" value="78.0322" />
+          <input type="hidden" id="target-location-name" value="Dehradun" />
+        </div>
+
+        <div class="input-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <label class="input-label" style="margin-bottom: 0;">Power needed</label>
+            <span id="mw-label" style="font-family: var(--font-mono); font-weight: 700; color: #38bdf8; font-size: 12px;">300 MW</span>
+          </div>
+          <input type="range" id="mw-slider" min="50" max="3000" step="50" value="300" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" oninput="document.getElementById('mw-label').textContent = this.value + ' MW'" />
+          <div style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-dim); margin-top: 2px;">
+            <span>50 MW</span><span>1,500 MW</span><span>3,000 MW</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <label class="input-label" style="margin-bottom: 0;">Search rivers within</label>
+            <span id="plan-radius-val" style="font-family: var(--font-mono); font-weight: 700; color: #38bdf8; font-size: 12px;">200 km</span>
+          </div>
+          <input type="range" id="plan-radius" min="50" max="400" step="25" value="200" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" oninput="document.getElementById('plan-radius-val').textContent = this.value + ' km'" />
+          <div style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-dim); margin-top: 2px;">
+            <span>50 km</span><span>225 km</span><span>400 km</span>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 4px;">
+          <label class="input-label">Rank sites by</label>
+          <div class="rank-choice" role="radiogroup" aria-label="Rank sites by">
+            <label><input type="radio" name="plan-rank" value="best" checked /> <span>Best overall</span></label>
+            <label><input type="radio" name="plan-rank" value="nearest" /> <span>Nearest to the city</span></label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-run-analysis" style="margin-top: 8px;" onclick="runCityPlan()">
+          <span>Find Dam Sites for this City</span>
+        </button>
+      </div>
+
+      <!-- SECTION 2b: River Dam Atlas — every feasible dam site along one whole river -->
+      <div class="panel-section" id="river-atlas">
+        <h2 class="panel-section-title">🗺️ River Dam Atlas</h2>
+        <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 8px;">Find every feasible dam site along a whole river, source to mouth.</p>
+        <button class="btn btn-primary btn-run-analysis" onclick="runRiverAtlas('selected')">
+          <span id="atlas-selected-label">Scan the selected river</span>
+        </button>
+        <button class="btn" id="pick-river-btn" style="width: 100%; justify-content: center; margin-top: 6px; font-size: 12px; border-color: rgba(253,224,71,.5);" onclick="setPickMode(!pickMode)">🖱️ Pick a river on the map</button>
+        <div id="pick-river-hint" style="display: none; font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.45;">Move the cursor over a river: its whole length lights up. Click it to find every dam site along it. Esc cancels.</div>
+      </div>
+
+      <!-- SECTION 3: Basin Telemetry & Real-Time Metrics -->
+      <div class="panel-section">
+        <h2 class="panel-section-title">📊 Basin Telemetry & Real-Time Metrics</h2>
+        <div class="telemetry-grid">
+          <div class="hud-card">
+            <div class="hud-card-label">📏 Length</div>
+            <div class="hud-card-val" id="hud-length">2,525 km</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-card-label">🌊 Discharge</div>
+            <div class="hud-card-val" id="hud-discharge">16,650 m³/s</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-card-label">🌐 Catchment</div>
+            <div class="hud-card-val" id="hud-catchment">861,452 km²</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-card-label">💧 Flow vs normal (site)</div>
+            <div class="hud-card-val" id="hud-health" style="color: #38bdf8;">…</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-card-label">🧱 Soil (site)</div>
+            <div class="hud-card-val" id="hud-bearing" style="color: #34d399;">…</div>
+          </div>
+          <div class="hud-card">
+            <div class="hud-card-label">⚠️ M5+ quakes ≤150 km</div>
+            <div class="hud-card-val" id="hud-seismic">…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Hydrological Modules -->
+      <div class="panel-section">
+        <h2 class="panel-section-title">🧭 Hydrological Modules</h2>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <div class="nav-item active" id="nav-overview" onclick="switchTab('overview')">
+            <span>🗺️</span>
+            <span>Overview & Telemetry</span>
+          </div>
+          <div class="nav-item" id="nav-dam-planner" onclick="switchTab('dam-planner')">
+            <span>⚡</span>
+            <span>Energy Dam Siting</span>
+            <span class="nav-badge-pill">NEW</span>
+          </div>
+          <div class="nav-item" id="nav-geotech" onclick="switchTab('geotech')">
+            <span>🧪</span>
+            <span>Site Conditions</span>
+          </div>
+          <div class="nav-item" id="nav-water" onclick="switchTab('water')" title="Turbidity and chlorophyll of a river or lake from recent Sentinel-2 satellite images">
+            <span>💧</span>
+            <span>Water Quality (Sentinel-2)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: Active Engine & Standards -->
+      <div class="panel-section">
+        <div style="padding: 10px; background: rgba(9, 14, 24, 0.9); border-radius: 8px; border: 1px solid var(--border-subtle);">
+          <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Active Engine Standards</div>
+          <div style="font-size: 11px; color: var(--green-light); font-weight: 600; margin-top: 2px;">⚡ P = η·ρ·g·Q·H</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">HydroRIVERS · GloFAS · SoilGrids · USGS · AWS Terrain</div>
+        </div>
+
+        <!-- Aqua Assistant Pill (Like Treeko) -->
+        <button type="button" class="aqua-pill" style="margin-top: 10px;" onclick="toggleAqua(true)" aria-label="Open Aqua assistant">
+          <span class="aqua-avatar" aria-hidden="true">🌊</span>
+          <div class="aqua-text">
+            <div class="aqua-name">Aqua</div>
+            <div class="aqua-desc">Gemma 4 Hydrology Assistant</div>
+          </div>
+          <span class="aqua-sparkle">✨</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Workspace & Map Area -->
+    <div class="main-workspace" id="main-workspace">
+      <!-- Map Viewport -->
+      <div class="content-area">
+        <div id="map-container"></div>
+
+        <!-- Right Side Overlays (Context Panels) -->
+        <div class="view-panel" id="dam-planner-panel" style="display: none;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>⚡</span>
+              <span id="dam-panel-title">Dam Site Plan</span>
+            </div>
+            <button class="btn" style="padding: 2px 6px;" onclick="closePanel('dam-planner-panel')">✕</button>
+          </div>
+          <div class="panel-body">
+                        <!-- Results container -->
+            <div id="dam-plan-results" style="margin-top: 16px; display: none;"></div>
+          </div>
+        </div>
+
+        <!-- Water Quality Panel -->
+        <div class="view-panel" id="water-panel" style="display: none;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>💧</span>
+              <span>Water Quality (Sentinel-2)</span>
+            </div>
+            <button class="btn" style="padding: 2px 6px;" onclick="closePanel('water-panel')">✕</button>
+          </div>
+          <div class="panel-body">
+            <p style="color: var(--text-muted); font-size: 12px; margin: 0 0 8px;">Turbidity and algae (chlorophyll) of a river or lake, measured from the newest cloud-free Sentinel-2 satellite images. Gemma 4 explains what it sees.</p>
+            <div id="water-selected" style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Click a river or lake on the map first.</div>
+            <button class="btn btn-primary" id="water-run" style="width: 100%; justify-content: center; padding: 10px;" onclick="runWaterQuality()">Analyse water quality here</button>
+            <div id="water-results" style="margin-top: 10px;"></div>
+          </div>
+        </div>
+
+        <!-- Geotechnical Details Panel -->
+        <div class="view-panel" id="geotech-panel" style="display: none;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🧪</span>
+              <span>Site Conditions: Soil, Earthquakes, Flow</span>
+            </div>
+            <button class="btn" style="padding: 2px 6px;" onclick="closePanel('geotech-panel')">✕</button>
+          </div>
+          <div class="panel-body" id="geotech-panel-body">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CINEMATIC "ANALYSING" FULLSCREEN OVERLAY
+       ========================================================================= -->
+  <div id="cinematic-analyser-overlay">
+    <div class="analyser-box">
+      <div class="analyser-radar">
+        <div class="analyser-radar-core"></div>
+      </div>
+      <h3 style="font-family: var(--font-heading); font-size: 18px; text-align: center; color: #ffffff;">
+        Analysing Hydrological & Geotechnical Terrain...
+      </h3>
+      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 4px;">
+        Executing multi-criteria cascade sizing for <span id="overlay-mw-target" style="color: #38bdf8; font-weight: 700;">600 MW</span> power target
+      </p>
+
+      <div class="analyser-step-list" id="analyser-step-list">
+        <div class="analyser-step active" id="step-1">
+          <span>⏳</span>
+          <span>[Stage 1/5] Snapping to the nearest major river (HydroRIVERS, HydroSHEDS)...</span>
+        </div>
+        <div class="analyser-step" id="step-2">
+          <span>⚪</span>
+          <span>[Stage 2/5] Following ~120 km of the main channel up- and downstream...</span>
+        </div>
+        <div class="analyser-step" id="step-3">
+          <span>⚪</span>
+          <span>[Stage 3/5] Sampling river-bed and valley-wall elevations (Copernicus DEM 90 m)...</span>
+        </div>
+        <div class="analyser-step" id="step-4">
+          <span>⚪</span>
+          <span>[Stage 4/5] Computing head H, flow Q and power P = &eta;&middot;&rho;&middot;g&middot;Q&middot;H for every ~6 km diversion...</span>
+        </div>
+        <div class="analyser-step" id="step-5">
+          <span>⚪</span>
+          <span>[Stage 5/5] Ranking sites and choosing non-overlapping schemes for the target...</span>
+        </div>
+      </div>
+
+      <div style="background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 11px; font-family: var(--font-mono); color: #38bdf8;" id="analyser-status-text">INITIALIZING SATELLITE RECONNAISSANCE</span>
+        <span style="font-size: 12px; font-family: var(--font-mono); font-weight: 700; color: #ffffff;" id="analyser-progress-pct">20%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       AQUA (GEMMA 4) DRAWER
+       ========================================================================= -->
+  <aside id="aqua-drawer">
+    <div class="drawer-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #06b6d4, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 14px;">✨</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 700; color: #ffffff;">Aqua Assistant</div>
+          <div style="font-size: 10px; color: #38bdf8; font-family: var(--font-mono);">Gemma 4 · Hydrology Assistant</div>
+        </div>
+      </div>
+      <button class="btn" style="padding: 4px 8px;" onclick="toggleAqua(false)">✕</button>
+    </div>
+
+    <!-- Quick Query Suggestions -->
+    <div class="quick-pill-strip">
+      <div class="quick-pill" onclick="sendAquaPrompt('Plan an optimal dam cascade for 800 MW electricity in Garhwal valley')">⚡ 800 MW Dam Plan</div>
+      <div class="quick-pill" onclick="sendAquaPrompt('What soil and foundation investigations are needed before building a weir on the active river?')">🧪 Site Investigation</div>
+      <div class="quick-pill" onclick="sendAquaPrompt('Explain CPCB water quality parameters and DO/BOD standards')">💧 Water Quality WQI</div>
+      <div class="quick-pill" onclick="sendAquaPrompt('How should earthquake history affect hydropower site selection on the active river?')">🚨 Seismic Risk</div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="drawer-messages" id="aqua-messages">
+      <div class="chat-bubble aqua">
+        <h3>🌊 Welcome to Aqua Terminal</h3>
+        I am <strong>Aqua</strong>, your Gemma 4-powered River Eyes hydrology assistant. Ask about:
+        <ul style="margin-left: 16px; margin-top: 6px;">
+          <li>Target power capacity to dam sizing (P = η · ρ · g · Q · H)</li>
+          <li>Soil, foundations and what site investigations are needed</li>
+          <li>River water quality, CPCB standards, and flood stages</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Input Box -->
+    <div class="drawer-input-box">
+      <input type="text" id="aqua-input" class="drawer-input" placeholder="Ask Aqua a question or enter MW target..." onkeydown="if(event.key==='Enter') submitAquaMessage()" />
+      <button class="btn btn-aqua" onclick="submitAquaMessage()">Send</button>
+    </div>
+  </aside>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</body>
+</html>
