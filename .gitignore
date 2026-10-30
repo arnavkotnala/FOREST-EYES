@@ -1,0 +1,16 @@
+# secrets — never upload
+.env
+**/.env
+# raw downloads (data/*.bin are rebuilt from these with scripts/build-rivers.py)
+HydroRIVERS data/
+HydroRIVERS data.zip
+*.gdb/
+# old full River Eyes project: not used by the live app, has its own keys and node_modules
+river-eyes chamoli/
+# tooling / OS
+node_modules/
+.DS_Store
+__MACOSX/
+
+# browser test screenshots (large)
+tests/browser/shots/
